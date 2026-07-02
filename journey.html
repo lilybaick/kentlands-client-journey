@@ -257,13 +257,16 @@ scrollEl.addEventListener("click", (e) => {           // click empty canvas clea
 /* ── node detail drawer (scripts, text-backs, links) ─────── */
 const TYPE_COLORS = { entry:"#3a7bc8", decision:"#7a4cc4", stage:"#8c6f5e", pipeline:"#b8863e", milestone:"#16a34a", urgent:"#dc2626", root:"#3a3a3a", ref:"#b0a89f" };
 const MOD_META = {
-  script:   { ic:"💬", label:"The script" },
-  behind:   { ic:"⚙️", label:"Behind the scenes" },
-  textback: { ic:"📲", label:"Auto text-back" },
-  link:     { ic:"🔗", label:"Link" },
-  tool:     { ic:"🛠️", label:"Tool in play" },
-  serve:    { ic:"🎯", label:"Fit" },
-  note:     { ic:"📌", label:"Good to know" }
+  script:    { ic:"💬", label:"The script" },
+  behind:    { ic:"⚙️", label:"Behind the scenes" },
+  textback:  { ic:"📲", label:"Auto text-back" },
+  link:      { ic:"🔗", label:"Link" },
+  tool:      { ic:"🛠️", label:"Tool in play" },
+  serve:     { ic:"🎯", label:"Fit" },
+  note:      { ic:"📌", label:"Good to know" },
+  faq:       { ic:"❓", label:"Client FAQ" },
+  checklist: { ic:"✅", label:"Internal checklist" },
+  problem:   { ic:"⚠️", label:"Watch-out" }
 };
 const clean = s => String(s).replace(/^[①②③④⑤⑥⑦⑧⑨]\s*/, "");
 function openDrawer(id) {

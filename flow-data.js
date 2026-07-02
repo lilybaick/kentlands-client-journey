@@ -192,8 +192,11 @@ window.JOURNEY = {
                               label: "Officially a Client",
                               sub: "Booked + paperwork complete",
                               type: "milestone",
-                              detail: ["Won Inquiry Automation", "Moved to Completed — Current Clients", "Enters NEW CLIENTS pipeline"],
-                              children: [ { id: "ref-retention", label: "→ Staying cared for", type: "ref", to: "retention" } ]
+                              detail: ["Won Inquiry Automation", "Moved to Completed — Current Clients", "Enters NEW CLIENTS pipeline", "On future calls, the phone tree now routes them as a current client"],
+                              children: [
+                                { id: "ref-retention", label: "→ Staying cared for", type: "ref", to: "retention" },
+                                { id: "ref-exclient", label: "→ Future calls: the Existing-Client menu", type: "ref", to: "existing-client" }
+                              ]
                             }
                           ]
                         }

@@ -398,6 +398,12 @@ footer { text-align: center; margin-top: 40px; font-size: 0.74rem; color: #bbb; 
 .nd-mod.m-behind { background: #f5f9fd; border-color: #d3e3f2; }
 .nd-mod.m-textback { background: #f3fbf4; border-color: #c3e6c9; }
 .nd-mod.m-serve, .nd-mod.m-note { background: #fbf9f6; }
+.nd-mod.m-faq { background: #f6f2fb; border-color: #ddd0ee; }
+.nd-mod.m-faq .nd-mod-h { color: #6a4ca0; }
+.nd-mod.m-checklist { background: #f2f9f3; border-color: #c3e6c9; }
+.nd-mod.m-checklist .nd-mod-h { color: #2a6e3a; }
+.nd-mod.m-problem { background: #fdf3ef; border-color: #f0cdbc; }
+.nd-mod.m-problem .nd-mod-h { color: #a5432a; }
 .nd-empty { color: var(--muted); font-size: 0.88rem; font-style: italic; padding: 8px 0; }
 
 /* clickable breadcrumb */

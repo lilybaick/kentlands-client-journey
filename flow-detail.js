@@ -103,7 +103,9 @@ window.FLOW_DETAIL = {
     { type: "link", title: "Records request form", body: "Release of Information & Records Request.", link: "https://link.kentlandspsychotherapy.com/widget/form/4qDE621P5Pe07bvNhy", linkLabel: "Open the records form" }
   ],
   "ex-billing": [
-    { type: "note", title: "Billing", body: "Superbills live in the desktop patient portal; the team can resend receipts and answer billing questions." }
+    { type: "note", title: "Billing", body: "Superbills live in the desktop patient portal; the team can resend receipts and answer billing questions." },
+    { type: "faq", title: "“Where's my superbill?”", body: "Superbills are titled “Statement for Insurance Reimbursement”, published monthly for the prior month, in the DESKTOP portal (scroll past the invoices). They carry the diagnostic + treatment codes insurers require for out-of-network reimbursement." },
+    { type: "problem", title: "Invoices ≠ superbills", body: "Clients keep submitting the Invoice (also in the portal) to their insurer — invoices lack the required codes and get rejected. They must submit the Superbill. It's in the Welcome Guide, but many miss it." }
   ],
   "ex-meds": [
     { type: "behind", title: "Med management", body: "Current-client med requests route to the Med Management pipeline via a form or a texted trigger link." }
@@ -120,7 +122,8 @@ window.FLOW_DETAIL = {
   ],
 
   response: [
-    { type: "behind", title: "The escalation engine", body: "If there's no reply: follow-up 9h → URGENT, waiting-on-response 16h → URGENT, low-priority 32h → URGENT. RESPONDED automations reset the clock the moment the client replies." }
+    { type: "behind", title: "The escalation engine", body: "If there's no reply: follow-up 9h → URGENT, waiting-on-response 16h → URGENT, low-priority 32h → URGENT. RESPONDED automations reset the clock the moment the client replies." },
+    { type: "checklist", title: "Coordinator call checklist", body: "• Confirm insurance / out-of-network fit · Capture the need + preferences · Set expectations (private pay, superbill) · Give onboarding info + the next step · Log the call note in GHL (via the CCC Console)." }
   ],
   matching: [
     { type: "tool", title: "How the match happens", body: "Matching form → opportunity; Syncing Clinician Data keeps availability live; the coordinator approves the clinician–client match." }
@@ -129,10 +132,14 @@ window.FLOW_DETAIL = {
     { type: "behind", title: "Behind the scenes", body: "Consult confirmation + reminder go out; the consult event moves the pipeline stage; waitlisted clients get a 7-day reminder." }
   ],
   paperwork: [
-    { type: "behind", title: "Keeping paperwork moving", body: "The PWK Pending stage tracks it; if it's incomplete after 48h it escalates to URGENT, and nudges keep it moving." }
+    { type: "behind", title: "Keeping paperwork moving", body: "The PWK Pending stage tracks it; if it's incomplete after 48h it escalates to URGENT, and nudges keep it moving." },
+    { type: "note", title: "Welcome Guide sent here", body: "Goes out with the SimplePractice paperwork. Covers finding us + parking, arrival, the client portal, appointment/telehealth details, and payments — including how superbills work for out-of-network reimbursement." },
+    { type: "checklist", title: "Onboarding checklist", body: "• Intake forms + credit card on file, 24h before the first appt · Set out-of-network expectations (private pay + monthly superbill) · Confirm portal access + where to find the superbill · Point them to the Welcome Guide." },
+    { type: "problem", title: "The Welcome Guide isn't being seen", body: "Clients aren't opening it — so they ask FAQs the guide already answers and submit invoices instead of superbills. Worth surfacing the key bits earlier / more visibly, not just in the attached PDF." }
   ],
   client: [
-    { type: "behind", title: "Becoming a client", body: "The Won Inquiry automation moves them to Completed / Current Clients and into the NEW CLIENTS (first 6 months) pipeline." }
+    { type: "behind", title: "Becoming a client", body: "The Won Inquiry automation moves them to Completed / Current Clients and into the NEW CLIENTS (first 6 months) pipeline." },
+    { type: "note", title: "Their phone-tree path changes", body: "Now recognized as a current client — future calls route to the Existing-Client menu (billing, records, meds, scheduling…), not the New-Client insurance flow." }
   ],
   reviews: [
     { type: "behind", title: "Reputation loop", body: "A 5-star survey nudges the client to leave a Google review; a low score routes to internal manual review + an email so nothing festers." }
