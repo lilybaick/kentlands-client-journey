@@ -9,7 +9,7 @@ An interactive visual map of how a prospective client becomes a long-term client
 | Page | What it is | Audience |
 |---|---|---|
 | `index.html` | Overview hub — the "one connected loop" and links to everything | Everyone |
-| `journey.html` | The 8-stage client journey (interactive accordion) | Everyone |
+| `journey.html` | Interactive flow chart of **all** client journeys (expandable) | Everyone |
 | `phone-tree.html` | Interactive phone menu — the front door, with what the CRM does at each step | Everyone |
 | `tools.html` | The 3 custom KP tools and how each connects to GHL | 🔒 Internal reference |
 | `system-map.html` | Full GHL inventory dashboard + automations, with a live data snapshot | 🔒 Internal reference |
@@ -25,11 +25,12 @@ An interactive visual map of how a prospective client becomes a long-term client
 ```
 kentlands-client-journey/
 ├── index.html            ← Overview hub
-├── journey.html          ← The 8-stage client journey
+├── journey.html          ← Interactive flow chart of all journeys
 ├── phone-tree.html       ← Interactive phone tree
 ├── tools.html            ← The 3 KP tools + GHL  (internal)
 ├── system-map.html       ← GHL inventory dashboard (internal)
 ├── styles.css            ← Shared design system
+├── flow-data.js          ← The journey flow chart, as editable data (see below)
 ├── README.md             ← This file
 └── content/              ← Plain-text source of truth (edit here, ask Claude to regenerate)
     ├── journey-stages.md
@@ -39,7 +40,9 @@ kentlands-client-journey/
     └── our-tools-and-ghl.md
 ```
 
-The `content/*.md` files are the editable source. After you change one, ask Claude to update the matching page. A few genuinely internal notes in those files (a known duplicate-record bug, an open "Roth" question, and "under construction" notes) are intentionally **kept out of the rendered pages** because the site is public.
+**To grow the flow chart** (`journey.html`), edit `flow-data.js` — it's a plain, commented list of boxes and the boxes they point to. Add a few lines and the chart redraws itself; you never touch the HTML.
+
+The `content/*.md` files are the editable source for the other pages. After you change one, ask Claude to update the matching page. A few genuinely internal notes in those files (a known duplicate-record bug, an open "Roth" question, and "under construction" notes) are intentionally **kept out of the rendered pages** because the site is public.
 
 ---
 

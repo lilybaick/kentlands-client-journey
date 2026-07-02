@@ -17,176 +17,150 @@
   <a class="nav-link" href="system-map.html">System Map <span class="lock">🔒</span></a>
 </nav>
 
-<div class="wrap wrap-narrow">
+<div class="wrap">
   <header class="hero">
     <h1>The Client Journey</h1>
-    <p class="lede">From first inquiry to active care — the eight stages, and what happens automatically at each one.</p>
+    <p class="lede">Every path a person can take through Kentlands Psychotherapy, as one connected flow chart. Click any box to expand its next steps.</p>
   </header>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#8c6f5e"></div> Manual step</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#3a7bc8"></div> Auto-triggered</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div> Urgent escalation</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3a7bc8"></div> Entry point</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7a4cc4"></div> Decision</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#8c6f5e"></div> Step</div>
     <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div> Milestone</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div> Urgent / can't serve</div>
   </div>
 
-  <div class="journey">
-
-    <!-- 1 Discovery -->
-    <div class="stage" onclick="toggle(this)">
-      <div class="stage-header">
-        <div class="stage-icon" style="background:#fef3ec;color:#c47a3a;">🔍</div>
-        <div class="stage-label"><h2>1 · Discovery</h2><p>How prospective clients find us</p></div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="stage-detail"><div class="stage-detail-inner">
-        <div class="detail-section"><h3>Channels</h3><div class="tags">
-          <span class="tag">Google Search</span><span class="tag">Referrals</span><span class="tag">Advertisements</span><span class="tag">Social Media</span><span class="tag">In-person Events</span><span class="tag">Attorney Referral</span>
-        </div></div>
-      </div></div>
-    </div>
-    <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-    <!-- 2 First Contact -->
-    <div class="stage" onclick="toggle(this)">
-      <div class="stage-header">
-        <div class="stage-icon" style="background:#eef6ff;color:#3a7bc8;">📞</div>
-        <div class="stage-label"><h2>2 · First Contact</h2><p>Inquiry enters the system</p></div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="stage-detail"><div class="stage-detail-inner">
-        <div class="detail-section"><h3>Entry Points</h3><div class="tags">
-          <span class="tag">Main Website Form</span><span class="tag">All Inquiries Webform</span><span class="tag">Phone Call (CCC#)</span><span class="tag">SMS to CCC#</span><span class="tag">Email to CCC#</span><span class="tag">Live Chat</span><span class="tag">Petra's Direct Line</span>
-        </div></div>
-        <div class="detail-section"><h3>Automations Triggered</h3><div class="tags">
-          <span class="tag auto">Main Website form → OPP Creation &amp; Notification</span><span class="tag auto">All Inquiries Webform → OPP Creation</span><span class="tag auto">Email / SMS / Live chat to CCC# → inquiry creation</span><span class="tag auto">Lead Filtering Phone System (front door)</span><span class="tag auto">Tagged by source</span>
-        </div></div>
-        <p class="outcome-note">Whichever door they use, the workflow ends by creating an <strong>Opportunity in the All Inquiries pipeline</strong> so nothing is lost. <a href="phone-tree.html">See the phone tree →</a></p>
-      </div></div>
-    </div>
-    <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-    <!-- 3 Response & Follow-up -->
-    <div class="stage" onclick="toggle(this)">
-      <div class="stage-header">
-        <div class="stage-icon" style="background:#fff0f0;color:#dc2626;">⚡</div>
-        <div class="stage-label"><h2>3 · Response &amp; Follow-up</h2><p>The team contacts the prospective client</p></div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="stage-detail"><div class="stage-detail-inner">
-        <div class="detail-section"><h3>Pipeline Stages</h3><div class="tags">
-          <span class="tag">New Inquiry (Not Contacted)</span><span class="tag">Calls, Txts, Emails</span><span class="tag">Needs Contacting Again</span><span class="tag">Client Responded</span><span class="tag">Follow Up Needed</span><span class="tag">Waiting on Client Response</span><span class="tag">Waiting on 3rd Party</span>
-        </div></div>
-        <div class="detail-section"><h3>Escalation Engine <span style="font-weight:normal;text-transform:none;letter-spacing:0;color:#aaa;">(all published &amp; live)</span></h3><div class="tags">
-          <span class="tag urgent">Follow-up needed: no response in 9 business hrs → URGENT</span><span class="tag urgent">Waiting on response: 16 business hrs → URGENT</span><span class="tag urgent">Low priority: 32 business hrs → URGENT</span><span class="tag auto">"Follow Up Needed" auto-moves after 1 day</span><span class="tag auto">"Waiting on Client" auto-moves after 2 days</span>
-        </div></div>
-      </div></div>
-    </div>
-    <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-    <!-- 4 Clinician Matching -->
-    <div class="stage" onclick="toggle(this)">
-      <div class="stage-header">
-        <div class="stage-icon" style="background:#f0faf0;color:#3a8c4a;">🤝</div>
-        <div class="stage-label"><h2>4 · Clinician Matching</h2><p>Finding the right fit</p></div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="stage-detail"><div class="stage-detail-inner">
-        <div class="detail-section"><h3>Steps</h3><div class="tags">
-          <span class="tag">Clinician Matching Form submitted</span><span class="tag">Insurance &amp; Pricing reviewed</span><span class="tag">Approved Clinician-Client Match</span>
-        </div></div>
-        <div class="detail-section"><h3>Automations</h3><div class="tags">
-          <span class="tag auto">Inquiry for clinician matching form submission</span><span class="tag auto">Appointment Desk Survey → Opportunity</span><span class="tag auto">Syncing Clinician Data (keeps availability fresh)</span>
-        </div></div>
-        <p class="outcome-note">The public Matching Tool reads clinician specialties &amp; openings to recommend a fit. <a href="tools.html">How the tool works →</a></p>
-      </div></div>
-    </div>
-    <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-    <!-- 5 Scheduling -->
-    <div class="stage" onclick="toggle(this)">
-      <div class="stage-header">
-        <div class="stage-icon" style="background:#f5f0ff;color:#7a4cc4;">📅</div>
-        <div class="stage-label"><h2>5 · Scheduling</h2><p>Booking the first appointment</p></div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="stage-detail"><div class="stage-detail-inner">
-        <div class="detail-section"><h3>Pipeline Stages</h3><div class="tags">
-          <span class="tag">Consult or FollowUp Scheduled</span><span class="tag">Ready to Schedule</span><span class="tag">Waiting List</span>
-        </div></div>
-        <div class="detail-section"><h3>Automations <span style="font-weight:normal;text-transform:none;letter-spacing:0;color:#aaa;">(building — currently drafts)</span></h3><div class="tags">
-          <span class="tag auto">Consult Calendar Confirmation &amp; Reminder</span><span class="tag auto">Consultation event → pipeline stage update</span><span class="tag auto">Waitlist 7-day reminder</span>
-        </div></div>
-      </div></div>
-    </div>
-    <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-    <!-- 6 Paperwork -->
-    <div class="stage" onclick="toggle(this)">
-      <div class="stage-header">
-        <div class="stage-icon" style="background:#fffbea;color:#c47a00;">📝</div>
-        <div class="stage-label"><h2>6 · Paperwork</h2><p>Completing intake documentation</p></div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="stage-detail"><div class="stage-detail-inner">
-        <div class="detail-section"><h3>Pipeline Stage</h3><div class="tags">
-          <span class="tag">PWK Pending (Scheduled)</span>
-        </div></div>
-        <div class="detail-section"><h3>Automations</h3><div class="tags">
-          <span class="tag auto">Paperwork sent to client</span><span class="tag urgent">PWK incomplete after 48 hrs → URGENT (live)</span><span class="tag auto">New Client Form submission → next steps (draft)</span>
-        </div></div>
-      </div></div>
-    </div>
-    <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-    <!-- 7 Officially a Client -->
-    <div class="stage" onclick="toggle(this)">
-      <div class="stage-header">
-        <div class="stage-icon" style="background:#f0fff4;color:#16a34a;">✅</div>
-        <div class="stage-label"><h2>7 · Officially a Client</h2><p>First appointment booked, paperwork complete</p></div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="stage-detail"><div class="stage-detail-inner">
-        <div class="detail-section"><h3>Milestones</h3><div class="tags">
-          <span class="tag green">Moved to "Completed — Current Clients" in All Inquiries</span><span class="tag green">Entered NEW CLIENTS pipeline (first 6 months)</span><span class="tag green">Client Status synced to Contact Type</span>
-        </div></div>
-        <div class="detail-section"><h3>Active Automations</h3><div class="tags">
-          <span class="tag auto">Won Inquiry Automation</span><span class="tag auto">72-hour appointment reminder (draft)</span><span class="tag auto">Satisfaction survey after sessions</span><span class="tag auto">Google Review link tracker</span>
-        </div></div>
-      </div></div>
-    </div>
-    <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-    <!-- 8 Ongoing Care -->
-    <div class="stage" onclick="toggle(this)">
-      <div class="stage-header">
-        <div class="stage-icon" style="background:#eef6ff;color:#0369a1;">🔄</div>
-        <div class="stage-label"><h2>8 · Ongoing Care</h2><p>Retaining and re-engaging active clients</p></div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="stage-detail"><div class="stage-detail-inner">
-        <div class="detail-section"><h3>Active Care Gaps Pipeline</h3><div class="tags">
-          <span class="tag">1–7 Days Since Last Appt</span><span class="tag">8–14 Days SLA</span><span class="tag">2–4 Weeks SLA</span><span class="tag">1–2 Months SLA</span><span class="tag">2+ Months SLA</span><span class="tag urgent">6+ Months SLA</span><span class="tag urgent">1 Year+ SLA</span>
-        </div></div>
-        <div class="detail-section"><h3>Re-engagement Automations</h3><div class="tags">
-          <span class="tag auto">Care Gaps &amp; New Client pipeline — opportunity updating &amp; tasks</span><span class="tag auto">No Next Appointment tag → automation triggered</span><span class="tag auto">Overdue balance → pipeline stage updated</span><span class="tag auto">Med. Management request → separate pipeline</span>
-        </div></div>
-      </div></div>
-    </div>
-    <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-    <div class="final-badge"><div class="badge">✦ Long-Term Client</div></div>
+  <div class="flow-controls">
+    <button class="flow-btn" onclick="expandAll()">Expand all</button>
+    <button class="flow-btn" onclick="collapseAll()">Collapse to top</button>
   </div>
 
-  <footer>Click any stage to expand · sourced from the GoHighLevel CRM · see the full <a href="system-map.html">System Map</a></footer>
+  <div class="flow-scroll" id="flow">
+    <div class="flow-inner" id="flow-inner">
+      <svg class="flow-svg" id="flow-svg"></svg>
+      <div id="flow-tree"></div>
+    </div>
+  </div>
+
+  <footer>Click a box to expand · dashed boxes jump to where that path continues · edit <code>flow-data.js</code> to grow the chart</footer>
 </div>
 
+<script src="flow-data.js"></script>
 <script>
-  function toggle(el) {
-    const isActive = el.classList.contains('active');
-    document.querySelectorAll('.stage.active').forEach(s => s.classList.remove('active'));
-    if (!isActive) el.classList.add('active');
+const SVGNS = "http://www.w3.org/2000/svg";
+const inner   = document.getElementById("flow-inner");
+const svg     = document.getElementById("flow-svg");
+const treeEl  = document.getElementById("flow-tree");
+const byId    = {};
+
+/* init: index nodes, set parents/depth, open the top two levels by default */
+(function init(node, parent, depth) {
+  node._parent = parent;
+  node._depth  = depth;
+  node._open   = depth <= 1;
+  byId[node.id] = node;
+  (node.children || []).forEach(c => init(c, node, depth + 1));
+})(JOURNEY, null, 0);
+
+function buildNode(node) {
+  const wrap = document.createElement("div");
+  wrap.className = "tree-node";
+
+  const card = document.createElement("div");
+  card.className = "node-card type-" + (node.type || "stage");
+  card.dataset.id = node.id;
+
+  let html = '<div class="n-label">' + node.label + '</div>';
+  if (node.sub) html += '<div class="n-sub">' + node.sub + '</div>';
+  if (node.detail && node._open) {
+    html += '<div class="n-detail">' + node.detail.map(d => '<div>' + d + '</div>').join('') + '</div>';
   }
+  card.innerHTML = html;
+
+  if (node.type === "ref" && node.to) {
+    card.addEventListener("click", () => jumpTo(node.to));
+  }
+
+  const kids = node.children || [];
+  if (kids.length) {
+    const btn = document.createElement("button");
+    btn.className = "node-toggle";
+    btn.innerHTML = node._open ? "&minus;" : ('+<span class="cnt">' + kids.length + '</span>');
+    btn.title = node._open ? "Collapse" : "Expand " + kids.length;
+    btn.addEventListener("click", (e) => { e.stopPropagation(); node._open = !node._open; render(); });
+    card.appendChild(btn);
+  }
+
+  wrap.appendChild(card);
+
+  if (kids.length && node._open) {
+    const childWrap = document.createElement("div");
+    childWrap.className = "tree-children";
+    kids.forEach(c => childWrap.appendChild(buildNode(c)));
+    wrap.appendChild(childWrap);
+  }
+  return wrap;
+}
+
+function render() {
+  treeEl.innerHTML = "";
+  treeEl.appendChild(buildNode(JOURNEY));
+  // draw synchronously (getBoundingClientRect forces layout); the timeout is a
+  // font-settle backstop. We avoid requestAnimationFrame because it is paused
+  // in backgrounded tabs, which would leave connectors undrawn.
+  drawConnectors();
+  setTimeout(drawConnectors, 0);
+}
+
+function drawConnectors() {
+  // size the SVG to the full content area
+  const w = inner.scrollWidth, h = inner.scrollHeight;
+  svg.setAttribute("width", w);
+  svg.setAttribute("height", h);
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  const base = inner.getBoundingClientRect();
+  const nodes = treeEl.querySelectorAll(".tree-node");
+  nodes.forEach(n => {
+    const parentCard = n.querySelector(":scope > .node-card");
+    const childWrap  = n.querySelector(":scope > .tree-children");
+    if (!parentCard || !childWrap) return;
+    const pr = parentCard.getBoundingClientRect();
+    const px = pr.right - base.left, py = pr.top - base.top + pr.height / 2;
+
+    childWrap.querySelectorAll(":scope > .tree-node > .node-card").forEach(cc => {
+      const cr = cc.getBoundingClientRect();
+      const cx = cr.left - base.left, cy = cr.top - base.top + cr.height / 2;
+      const dx = Math.max(18, (cx - px) / 2);
+      const path = document.createElementNS(SVGNS, "path");
+      path.setAttribute("d", `M ${px} ${py} C ${px + dx} ${py}, ${cx - dx} ${cy}, ${cx} ${cy}`);
+      svg.appendChild(path);
+    });
+  });
+}
+
+function jumpTo(id) {
+  const target = byId[id];
+  if (!target) return;
+  for (let n = target; n; n = n._parent) n._open = true;  // open ancestors
+  render();
+  const el = treeEl.querySelector('.node-card[data-id="' + id + '"]');
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+  el.classList.add("flash");
+  setTimeout(() => el.classList.remove("flash"), 1200);
+}
+
+function setAll(open) { Object.values(byId).forEach(n => { if (n.children && n.children.length) n._open = open; }); render(); }
+function expandAll()   { setAll(true); }
+function collapseAll() { Object.values(byId).forEach(n => n._open = (n._depth <= 1)); render(); }
+
+window.addEventListener("resize", drawConnectors);
+window.addEventListener("load", drawConnectors);
+render();
+setTimeout(drawConnectors, 200);  // redraw once fonts have settled layout
 </script>
 </body>
 </html>
