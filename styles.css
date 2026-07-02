@@ -230,31 +230,58 @@ table.data tr:last-child td { border-bottom: none; }
    Left-to-right expandable tree. JS builds:
      .tree-node > (.node-card [+ .node-toggle])  +  .tree-children (column of .tree-node)
    and draws SVG bezier connectors parent-right → child-left over .flow-svg. */
-.flow-controls { display: flex; justify-content: center; gap: 10px; margin: 4px 0 20px; }
+/* stage = the fullscreen-able container (toolbar + canvas) */
+.flow-stage { display: flex; flex-direction: column; }
+
+/* toolbar */
+.flow-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 14px; }
+.tb-spacer { flex: 1 1 auto; }
 .flow-btn {
   font-family: inherit; font-size: 0.8rem; letter-spacing: 0.02em;
   color: #6a5a4e; background: #fff; border: 1.5px solid var(--border);
-  border-radius: 20px; padding: 7px 16px; cursor: pointer;
+  border-radius: 20px; padding: 7px 14px; cursor: pointer;
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 .flow-btn:hover { border-color: var(--brown); color: var(--brown); background: var(--brown-bg); }
+.flow-btn.ic { width: 34px; padding: 7px 0; text-align: center; font-size: 1rem; line-height: 1; }
+.zoom-group { display: flex; align-items: center; gap: 4px; }
+.zoom-group .zlabel { min-width: 56px; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* search box */
+.flow-search { display: flex; align-items: center; gap: 6px; background: #fff;
+  border: 1.5px solid var(--border); border-radius: 20px; padding: 4px 12px; }
+.flow-search:focus-within { border-color: var(--brown); }
+.flow-search .s-ic { color: var(--muted); font-size: 0.95rem; }
+.flow-search input { font-family: inherit; font-size: 0.85rem; border: none; outline: none;
+  background: transparent; color: var(--text); width: 170px; }
+.flow-search .s-count { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
 
 .flow-scroll {
-  overflow: auto; -webkit-overflow-scrolling: touch;
+  position: relative; overflow: auto; -webkit-overflow-scrolling: touch;
   background:
     radial-gradient(circle at 1px 1px, #e7e0d8 1px, transparent 0) 0 0 / 22px 22px,
     #fcfaf7;
   border: 1.5px solid var(--border); border-radius: 16px;
-  padding: 28px 24px; max-height: 78vh;
+  padding: 28px 24px; max-height: 78vh; cursor: grab;
 }
-.flow-inner { position: relative; display: inline-block; min-width: 100%; }
+.flow-scroll.grabbing { cursor: grabbing; }
+.flow-sizer { position: relative; }
+.flow-inner { position: absolute; top: 0; left: 0; transform-origin: 0 0; display: inline-block; }
+
+/* fullscreen */
+.flow-stage:fullscreen { background: var(--bg); padding: 16px 22px; }
+.flow-stage:fullscreen .flow-scroll { max-height: none; flex: 1 1 auto; }
+.flow-stage:-webkit-full-screen { background: var(--bg); padding: 16px 22px; }
+.flow-stage:-webkit-full-screen .flow-scroll { max-height: none; flex: 1 1 auto; }
 .flow-svg { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
 .flow-svg path { fill: none; stroke: #cbbcae; stroke-width: 2; }
 
-/* the tree: each node is [card | its children column], laid left → right */
-.tree-node { display: flex; flex-direction: row; align-items: center; }
+/* the tree: each node is [card | its children column], laid left → right.
+   top-aligned so the root stays pinned at top-left and node positions are
+   stable as branches expand (predictable scrolling, no empty canvas). */
+.tree-node { display: flex; flex-direction: row; align-items: flex-start; }
 .tree-children {
-  display: flex; flex-direction: column; justify-content: center;
+  display: flex; flex-direction: column; justify-content: flex-start;
   gap: 14px; margin-left: 46px;   /* horizontal gap = room for connectors */
 }
 
@@ -308,6 +335,20 @@ table.data tr:last-child td { border-bottom: none; }
   0%, 100% { box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   20%, 60% { box-shadow: 0 0 0 3px rgba(140,111,94,0.5), 0 6px 22px rgba(140,111,94,0.3); }
 }
+
+/* path highlight — click a box to trace root → step */
+.flow-inner.has-selection .node-card { opacity: 0.32; transition: opacity 0.2s; }
+.flow-inner.has-selection .node-card.on-path {
+  opacity: 1; border-color: var(--brown);
+  box-shadow: 0 0 0 2px rgba(140,111,94,0.55), 0 6px 20px rgba(140,111,94,0.22);
+}
+.flow-svg path { transition: stroke 0.2s, stroke-width 0.2s; }
+.flow-inner.has-selection .flow-svg path { stroke: #e2d8cd; }
+.flow-svg path.hl { stroke: var(--brown); stroke-width: 3; }
+
+/* search matches */
+.node-card.match { box-shadow: 0 0 0 2px #b8863e, 0 4px 16px rgba(184,134,62,0.22); }
+.flow-inner.has-selection .node-card.match { opacity: 1; }
 
 @media (max-width: 560px) {
   .tree-children { margin-left: 30px; gap: 10px; }

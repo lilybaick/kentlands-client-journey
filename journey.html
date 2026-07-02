@@ -20,7 +20,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>The Client Journey</h1>
-    <p class="lede">Every path a person can take through Kentlands Psychotherapy, as one connected flow chart. Click any box to expand its next steps.</p>
+    <p class="lede">Every path a person can take through Kentlands Psychotherapy, as one connected flow chart. Click a box to trace its full path; search to jump anywhere.</p>
   </header>
 
   <div class="legend">
@@ -31,37 +31,66 @@
     <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div> Urgent / can't serve</div>
   </div>
 
-  <div class="flow-controls">
-    <button class="flow-btn" onclick="expandAll()">Expand all</button>
-    <button class="flow-btn" onclick="collapseAll()">Collapse to top</button>
-  </div>
+  <!-- everything inside .flow-stage is what goes fullscreen -->
+  <div class="flow-stage" id="flow-stage">
+    <div class="flow-toolbar">
+      <div class="flow-search">
+        <span class="s-ic">⌕</span>
+        <input id="flow-search" type="text" placeholder="Search steps…" autocomplete="off" />
+        <span class="s-count" id="s-count"></span>
+      </div>
+      <div class="tb-spacer"></div>
+      <button class="flow-btn" onclick="expandAll()">Expand all</button>
+      <button class="flow-btn" onclick="collapseAll()">Collapse</button>
+      <div class="zoom-group">
+        <button class="flow-btn ic" onclick="zoomBy(-0.15)" title="Zoom out">&minus;</button>
+        <button class="flow-btn zlabel" id="zlabel" onclick="zoomFit()" title="Fit to screen">100%</button>
+        <button class="flow-btn ic" onclick="zoomBy(0.15)" title="Zoom in">+</button>
+      </div>
+      <button class="flow-btn ic" id="fs-btn" onclick="toggleFull()" title="Fullscreen">⛶</button>
+    </div>
 
-  <div class="flow-scroll" id="flow">
-    <div class="flow-inner" id="flow-inner">
-      <svg class="flow-svg" id="flow-svg"></svg>
-      <div id="flow-tree"></div>
+    <div class="flow-scroll" id="flow">
+      <div class="flow-sizer" id="flow-sizer">
+        <div class="flow-inner" id="flow-inner">
+          <svg class="flow-svg" id="flow-svg"></svg>
+          <div id="flow-tree"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <footer>Click a box to expand · dashed boxes jump to where that path continues · edit <code>flow-data.js</code> to grow the chart</footer>
+  <footer>Click a box to trace its path · search to jump · scroll or drag to pan · ctrl/⌘+scroll or the +/− buttons to zoom · edit <code>flow-data.js</code> to grow the chart</footer>
 </div>
 
 <script src="flow-data.js"></script>
 <script>
-const SVGNS = "http://www.w3.org/2000/svg";
+const SVGNS   = "http://www.w3.org/2000/svg";
+const stageEl = document.getElementById("flow-stage");
+const scrollEl= document.getElementById("flow");
+const sizer   = document.getElementById("flow-sizer");
 const inner   = document.getElementById("flow-inner");
 const svg     = document.getElementById("flow-svg");
 const treeEl  = document.getElementById("flow-tree");
+const searchIn= document.getElementById("flow-search");
+const sCount  = document.getElementById("s-count");
+const zlabel  = document.getElementById("zlabel");
 const byId    = {};
+let scale = 1;
+let selectedId = null;
 
 /* init: index nodes, set parents/depth, open the top two levels by default */
 (function init(node, parent, depth) {
-  node._parent = parent;
-  node._depth  = depth;
-  node._open   = depth <= 1;
+  node._parent = parent; node._depth = depth; node._open = depth <= 1;
   byId[node.id] = node;
   (node.children || []).forEach(c => init(c, node, depth + 1));
 })(JOURNEY, null, 0);
+
+function ancestors(id) {              // [node ... root]
+  const chain = [];
+  for (let n = byId[id]; n; n = n._parent) chain.push(n);
+  return chain;
+}
 
 function buildNode(node) {
   const wrap = document.createElement("div");
@@ -79,7 +108,9 @@ function buildNode(node) {
   card.innerHTML = html;
 
   if (node.type === "ref" && node.to) {
-    card.addEventListener("click", () => jumpTo(node.to));
+    card.addEventListener("click", (e) => { e.stopPropagation(); jumpTo(node.to); });
+  } else if (node.id !== "root") {
+    card.addEventListener("click", (e) => { e.stopPropagation(); selectPath(node.id); });
   }
 
   const kids = node.children || [];
@@ -91,7 +122,6 @@ function buildNode(node) {
     btn.addEventListener("click", (e) => { e.stopPropagation(); node._open = !node._open; render(); });
     card.appendChild(btn);
   }
-
   wrap.appendChild(card);
 
   if (kids.length && node._open) {
@@ -106,65 +136,165 @@ function buildNode(node) {
 function render() {
   treeEl.innerHTML = "";
   treeEl.appendChild(buildNode(JOURNEY));
-  // draw synchronously (getBoundingClientRect forces layout); the timeout is a
-  // font-settle backstop. We avoid requestAnimationFrame because it is paused
-  // in backgrounded tabs, which would leave connectors undrawn.
-  drawConnectors();
-  setTimeout(drawConnectors, 0);
+  applyZoom();          // sizes sizer + draws connectors
+  paintSelection();
+  paintSearch();
 }
 
-function drawConnectors() {
-  // size the SVG to the full content area
-  const w = inner.scrollWidth, h = inner.scrollHeight;
-  svg.setAttribute("width", w);
-  svg.setAttribute("height", h);
-  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
-  while (svg.firstChild) svg.removeChild(svg.firstChild);
+function applyZoom() {
+  inner.style.transform = "scale(" + scale + ")";
+  // layout size is transform-independent; size the sizer so scrollbars fit the scaled art
+  const lw = inner.scrollWidth, lh = inner.scrollHeight;
+  sizer.style.width  = (lw * scale) + "px";
+  sizer.style.height = (lh * scale) + "px";
+  zlabel.textContent = Math.round(scale * 100) + "%";
+  drawConnectors(lw, lh);
+}
 
-  const base = inner.getBoundingClientRect();
-  const nodes = treeEl.querySelectorAll(".tree-node");
-  nodes.forEach(n => {
+function drawConnectors(lw, lh) {
+  svg.setAttribute("width", lw); svg.setAttribute("height", lh);
+  svg.setAttribute("viewBox", "0 0 " + lw + " " + lh);
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const base = inner.getBoundingClientRect();           // scaled rect of the origin
+  treeEl.querySelectorAll(".tree-node").forEach(n => {
     const parentCard = n.querySelector(":scope > .node-card");
     const childWrap  = n.querySelector(":scope > .tree-children");
     if (!parentCard || !childWrap) return;
     const pr = parentCard.getBoundingClientRect();
-    const px = pr.right - base.left, py = pr.top - base.top + pr.height / 2;
-
+    const px = (pr.right - base.left) / scale, py = (pr.top - base.top + pr.height / 2) / scale;
+    const pid = parentCard.dataset.id;
     childWrap.querySelectorAll(":scope > .tree-node > .node-card").forEach(cc => {
       const cr = cc.getBoundingClientRect();
-      const cx = cr.left - base.left, cy = cr.top - base.top + cr.height / 2;
+      const cx = (cr.left - base.left) / scale, cy = (cr.top - base.top + cr.height / 2) / scale;
       const dx = Math.max(18, (cx - px) / 2);
       const path = document.createElementNS(SVGNS, "path");
       path.setAttribute("d", `M ${px} ${py} C ${px + dx} ${py}, ${cx - dx} ${cy}, ${cx} ${cy}`);
+      path.dataset.to = cc.dataset.id;
       svg.appendChild(path);
     });
   });
 }
 
-function jumpTo(id) {
-  const target = byId[id];
-  if (!target) return;
-  for (let n = target; n; n = n._parent) n._open = true;  // open ancestors
-  render();
-  const el = treeEl.querySelector('.node-card[data-id="' + id + '"]');
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-  el.classList.add("flash");
-  setTimeout(() => el.classList.remove("flash"), 1200);
+/* ── zoom ─────────────────────────────── */
+function setScale(s, focal) {
+  s = Math.min(2, Math.max(0.3, s));
+  if (Math.abs(s - scale) < 0.001) return;
+  // keep the focal point (viewport coords) stable while zooming
+  const rect = scrollEl.getBoundingClientRect();
+  const fx = (focal ? focal.x : rect.width / 2), fy = (focal ? focal.y : rect.height / 2);
+  const cx = (scrollEl.scrollLeft + fx) / scale, cy = (scrollEl.scrollTop + fy) / scale;
+  scale = s; applyZoom();
+  scrollEl.scrollLeft = cx * scale - fx; scrollEl.scrollTop = cy * scale - fy;
+}
+function zoomBy(d) { setScale(scale + d); }
+function zoomFit() {
+  const lw = inner.scrollWidth, lh = inner.scrollHeight;
+  const pad = 40;
+  const s = Math.min((scrollEl.clientWidth - pad) / lw, (scrollEl.clientHeight - pad) / lh, 1);
+  scale = Math.max(0.3, s); applyZoom(); scrollToRoot();
 }
 
-function scrollToRoot() {
-  const el = treeEl.querySelector('.node-card[data-id="root"]');
-  if (el) el.scrollIntoView({ behavior: "smooth", block: "center", inline: "start" });
+/* ── expand / collapse / navigation ─────── */
+// reliable center-scroll of the .flow-scroll container to a card (works with scale/abs layout)
+function scrollToCard(el, inlineStart) {
+  if (!el) return;
+  setTimeout(() => {                       // let layout settle after render/applyZoom (setTimeout fires even when rAF is throttled)
+    const cr = el.getBoundingClientRect(), fr = scrollEl.getBoundingClientRect();
+    const left = scrollEl.scrollLeft + (cr.left - fr.left) - (inlineStart ? 40 : (scrollEl.clientWidth - cr.width) / 2);
+    const top  = scrollEl.scrollTop  + (cr.top  - fr.top)  - (scrollEl.clientHeight - cr.height) / 2;
+    scrollEl.scrollTo({ left: Math.max(0, left), top: Math.max(0, top), behavior: "smooth" });
+  }, 60);
 }
+function scrollToRoot() { scrollToCard(treeEl.querySelector('.node-card[data-id="root"]'), true); }
 function setAll(open) { Object.values(byId).forEach(n => { if (n.children && n.children.length) n._open = open; }); render(); scrollToRoot(); }
 function expandAll()   { setAll(true); }
 function collapseAll() { Object.values(byId).forEach(n => n._open = (n._depth <= 1)); render(); scrollToRoot(); }
 
-window.addEventListener("resize", drawConnectors);
-window.addEventListener("load", drawConnectors);
+function jumpTo(id) {
+  const t = byId[id]; if (!t) return;
+  for (let n = t; n; n = n._parent) n._open = true;
+  selectedId = id; render();
+  const el = treeEl.querySelector('.node-card[data-id="' + id + '"]');
+  if (el) { scrollToCard(el);
+            el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1200); }
+}
+
+/* ── path highlight (best-idea #4) ──────── */
+function selectPath(id) {
+  selectedId = (selectedId === id) ? null : id;
+  paintSelection();
+}
+function paintSelection() {
+  const path = selectedId ? new Set(ancestors(selectedId).map(n => n.id)) : null;
+  inner.classList.toggle("has-selection", !!path);
+  treeEl.querySelectorAll(".node-card").forEach(c =>
+    c.classList.toggle("on-path", !!path && path.has(c.dataset.id)));
+  svg.querySelectorAll("path").forEach(p =>
+    p.classList.toggle("hl", !!path && path.has(p.dataset.to)));
+}
+scrollEl.addEventListener("click", (e) => {           // click empty canvas clears
+  if (e.target === scrollEl || e.target === sizer || e.target === inner || e.target.tagName === "svg") {
+    selectedId = null; paintSelection();
+  }
+});
+
+/* ── search (best-idea #3) ──────────────── */
+let searchMatches = [];
+function matchNode(n, term) {
+  const hay = (n.label + " " + (n.sub || "") + " " + (n.detail || []).join(" ")).toLowerCase();
+  return hay.includes(term);
+}
+searchIn.addEventListener("input", () => {
+  const term = searchIn.value.trim().toLowerCase();
+  if (term.length < 2) { searchMatches = []; render(); return; }
+  searchMatches = Object.values(byId).filter(n => n.id !== "root" && matchNode(n, term));
+  searchMatches.forEach(n => { for (let a = n; a; a = a._parent) a._open = true; }); // reveal
+  render();
+  if (searchMatches[0]) scrollToCard(treeEl.querySelector('.node-card[data-id="' + searchMatches[0].id + '"]'));
+});
+searchIn.addEventListener("keydown", (e) => { if (e.key === "Escape") { searchIn.value = ""; searchMatches = []; render(); } });
+function paintSearch() {
+  const ids = new Set(searchMatches.map(n => n.id));
+  treeEl.querySelectorAll(".node-card").forEach(c => c.classList.toggle("match", ids.has(c.dataset.id)));
+  sCount.textContent = searchIn.value.trim().length >= 2 ? (searchMatches.length + " found") : "";
+}
+
+/* ── pan: drag empty canvas ─────────────── */
+let panning = false, sx, sy, sl, st;
+scrollEl.addEventListener("mousedown", (e) => {
+  if (e.target.closest(".node-card, .node-toggle")) return;   // let cards/buttons work
+  panning = true; sx = e.clientX; sy = e.clientY; sl = scrollEl.scrollLeft; st = scrollEl.scrollTop;
+  scrollEl.classList.add("grabbing");
+});
+window.addEventListener("mousemove", (e) => {
+  if (!panning) return;
+  scrollEl.scrollLeft = sl - (e.clientX - sx); scrollEl.scrollTop = st - (e.clientY - sy);
+});
+window.addEventListener("mouseup", () => { panning = false; scrollEl.classList.remove("grabbing"); });
+
+/* ctrl/⌘ + wheel to zoom toward the cursor */
+scrollEl.addEventListener("wheel", (e) => {
+  if (!(e.ctrlKey || e.metaKey)) return;
+  e.preventDefault();
+  const rect = scrollEl.getBoundingClientRect();
+  setScale(scale + (e.deltaY < 0 ? 0.12 : -0.12), { x: e.clientX - rect.left, y: e.clientY - rect.top });
+}, { passive: false });
+
+/* ── fullscreen (requested) ─────────────── */
+function toggleFull() {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else stageEl.requestFullscreen().catch(() => {});
+}
+document.addEventListener("fullscreenchange", () => {
+  const on = !!document.fullscreenElement;
+  document.getElementById("fs-btn").innerHTML = on ? "⤢" : "⛶";
+  setTimeout(() => { applyZoom(); if (on) zoomFit(); }, 60);
+});
+
+window.addEventListener("resize", () => applyZoom());
+window.addEventListener("load", () => applyZoom());
 render();
-setTimeout(drawConnectors, 200);  // redraw once fonts have settled layout
+setTimeout(applyZoom, 200);   // redraw once fonts settle
 </script>
 </body>
 </html>
