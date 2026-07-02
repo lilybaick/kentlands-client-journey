@@ -273,6 +273,9 @@ table.data tr:last-child td { border-bottom: none; }
 .flow-stage:fullscreen .flow-scroll { max-height: none; flex: 1 1 auto; }
 .flow-stage:-webkit-full-screen { background: var(--bg); padding: 16px 22px; }
 .flow-stage:-webkit-full-screen .flow-scroll { max-height: none; flex: 1 1 auto; }
+/* drawer must live inside .flow-stage so it renders in fullscreen; flush to top there (no nav) */
+.flow-stage:fullscreen .node-drawer { top: 0; }
+.flow-stage:-webkit-full-screen .node-drawer { top: 0; }
 .flow-svg { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
 .flow-svg path { fill: none; stroke: #cbbcae; stroke-width: 2; }
 
