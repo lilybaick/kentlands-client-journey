@@ -168,6 +168,9 @@ window.FLOW_DETAIL = {
   "clinician-console": [
     { type: "tool", title: "Clinician self-service", body: "Clinicians sign in (email + last-4 of phone) and flip OPEN/FULL or edit their bio/age range. Availability writes straight to their GHL record and the matcher picks it up — so the public tool is always current." }
   ],
+  "team-tools": [
+    { type: "note", title: "Backstage, not a client channel", body: "These are internal tools — not a way clients reach us. The Matching Tool (a client channel) lives up in Getting in touch; the two consoles here are how the team works the inquiry and keeps the match current." }
+  ],
 
   /* ── Getting-in-touch extras ── */
   "entry": [

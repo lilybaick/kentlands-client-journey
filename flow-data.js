@@ -106,13 +106,9 @@ window.JOURNEY = {
         },
         { id: "webforms", label: "Web forms", sub: "Website & webforms", type: "entry", detail: ["Main Website Contact form", "All Inquiries webform", "Website Testing Inquiry form", "Cancellation Request"], children: [ { id: "ref-web", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
         {
-          id: "tools", label: "Our tools", sub: "The 3 KP tools", type: "entry",
-          detail: ["Custom software LIAH built on top of GHL"],
+          id: "matching-tool", label: "Clinician Matching Tool", sub: "Our self-serve search — a client channel", type: "decision",
+          detail: ["Our software (built on GHL): the self-serve way a client finds their own match", "A 3-step wizard, in order — the insurance step only comes at the very end, when you connect"],
           children: [
-            {
-              id: "matching-tool", label: "Clinician Matching Tool", sub: "Public self-serve search", type: "decision",
-              detail: ["A 3-step wizard, in order — the insurance step only comes at the very end, when you connect"],
-              children: [
                 {
                   id: "mt-care", label: "Step 1 · Type of care", sub: "routes what you'll see", type: "decision",
                   detail: ["Therapy (individual · minor · couples · family) · Medication · Testing"],
@@ -146,14 +142,6 @@ window.JOURNEY = {
                   ]
                 }
               ]
-            },
-            { id: "ccc-console", label: "CCC Console", sub: "Coordinator call co-pilot", type: "stage",
-              detail: ["Guides the coordinator through the call live", "Reuses the SAME matcher engine on the call", "Writes the call note straight into GHL"],
-              children: [ { id: "ref-ccc", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
-            { id: "clinician-console", label: "Clinician Console", sub: "Clinician self-service", type: "stage",
-              detail: ["Clinicians set OPEN / FULL + edit their profile", "Availability feeds the matcher in real time"],
-              children: [ { id: "ref-clincon", label: "→ Feeds the matcher", type: "ref", to: "matching-tool" } ] }
-          ]
         }
       ]
     },
@@ -246,6 +234,23 @@ window.JOURNEY = {
         { id: "business", label: "Business — Vendor & Referral", type: "stage", detail: ["New Lead → Contacted → Proposal Sent → Closed"] },
         { id: "referral", label: "Referral Outreach", type: "stage", detail: ["Proactive outreach to referral partners", "New Lead → Contacted → Proposal → Closed"] },
         { id: "applicants", label: "Applicants — Job / Internship", type: "stage", detail: ["New Applicant → Responded → Application → Interview → Offer → Onboarding"] }
+      ]
+    },
+
+    /* ───────────────── ⑤ BEHIND THE SCENES (internal tools) ───────────────── */
+    {
+      id: "team-tools",
+      label: "⑤ Behind the scenes",
+      sub: "🔒 Internal tools that serve the client",
+      type: "pipeline",
+      detail: ["Not how clients reach us — how our team works the inquiry and keeps the match current"],
+      children: [
+        { id: "ccc-console", label: "CCC Console", sub: "Coordinator call co-pilot", type: "stage",
+          detail: ["Guides the coordinator through the call live", "Reuses the SAME matcher engine on the call", "Logs the call note straight into GHL"],
+          children: [ { id: "ref-ccc", label: "→ Works the inquiry (Response & Follow-up)", type: "ref", to: "response" } ] },
+        { id: "clinician-console", label: "Clinician Console", sub: "Clinician self-service", type: "stage",
+          detail: ["Clinicians set OPEN / FULL + edit their profile", "Availability feeds the matcher in real time"],
+          children: [ { id: "ref-clincon", label: "→ Keeps the Matching Tool current", type: "ref", to: "matching-tool" } ] }
       ]
     }
   ]
