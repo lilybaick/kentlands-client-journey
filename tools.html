@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Tools &amp; GHL — Kentlands Psychotherapy</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html"><span class="dot"></span> Kentlands Psychotherapy</a>
+  <a class="nav-link" href="index.html">Overview</a>
+  <a class="nav-link" href="journey.html">Journey</a>
+  <a class="nav-link" href="phone-tree.html">Phone Tree</a>
+  <a class="nav-link active" href="tools.html">Tools <span class="lock">🔒</span></a>
+  <a class="nav-link" href="system-map.html">System Map <span class="lock">🔒</span></a>
+</nav>
+
+<div class="internal-banner">🔒 Internal reference — how our tooling connects to GoHighLevel</div>
+
+<div class="wrap wrap-narrow">
+  <header class="hero">
+    <h1>Our Tools &amp; GHL <span class="badge-internal">Internal</span></h1>
+    <p class="lede">Kentlands runs three custom tools that plug into the same GoHighLevel account. Here's exactly what each one reads and writes, so the whole system is visible in one place.</p>
+  </header>
+
+  <!-- Tool 1 -->
+  <div class="tool">
+    <h2>1 · Clinician Matching Tool</h2>
+    <p class="tool-role">Public search page — helps a prospective client find the right-fit clinician, then hands off to intake.</p>
+    <div class="io-row"><span class="io-label">Reads</span><span class="io-val">The <code>Clinicians</code> custom object (43 fields — specialties, populations, modalities, ages, service flags, availability <code>new_pt_openings</code>, bio, photos). A Cloudflare Worker pulls it, strips to a public allow-list (no internal notes), and serves it.</span></div>
+    <div class="io-row"><span class="io-label">Also reads</span><span class="io-val">The <code>Testing Availabilities</code> object (team availability by month) for the testing-team card.</span></div>
+    <div class="io-row"><span class="io-label">Kept fresh by</span><span class="io-val">The <code>Syncing Clinician Data</code> workflow — when a clinician record changes in GHL it fires a webhook that re-syncs the tool.</span></div>
+    <div class="io-row"><span class="io-label">Hands off</span><span class="io-val">Via the <code>Clinician Matching - Form</code> → <code>Inquiry for clinician matching form submission</code> workflow → Opportunity in <strong>All Inquiries</strong>.</span></div>
+  </div>
+
+  <!-- Tool 2 -->
+  <div class="tool">
+    <h2>2 · Coordinator (CCC) Console</h2>
+    <p class="tool-role">Internal call co-pilot — guides client-care coordinators through calls and logs them straight into GHL.</p>
+    <div class="io-row"><span class="io-label">Writes</span><span class="io-val">The <code>CCC internal call note (from CCC Console)</code> form → <code>Inquiry for CCC Call Scripting form submission</code> workflow → creates / updates the inquiry + note.</span></div>
+    <div class="io-row"><span class="io-label">Uses</span><span class="io-val">The CCC "Excel…" contact fields (Coordinator, Summary, Follow-up Needed, Response to Caller, Time 1st Responded) and the "AD…" Appointment-Desk fields — the structured call-log the team works from.</span></div>
+    <div class="io-row"><span class="io-label">Reuses</span><span class="io-val">The Matching Tool's engine to recommend clinicians live on the call.</span></div>
+    <div class="io-row"><span class="io-label">Works</span><span class="io-val">The <strong>All Inquiries</strong> pipeline (16 stages) plus the escalation engine (9h / 16h / 32h → URGENT).</span></div>
+  </div>
+
+  <!-- Tool 3 -->
+  <div class="tool">
+    <h2>3 · Clinician Console</h2>
+    <p class="tool-role">Clinician self-service — lets clinicians manage their own availability, info, and tickets.</p>
+    <div class="io-row"><span class="io-label">Availability</span><span class="io-val"><code>Current Availability for Clinicians</code> form / <code>Clinician Availability Survey</code> → updates <code>new_pt_openings</code> on the Clinicians object (via a write Worker) → flows straight to the Matching Tool.</span></div>
+    <div class="io-row"><span class="io-label">Tickets</span><span class="io-val"><code>Admin Ticket for Clinicians</code> form → <code>Inquiry for admin ticket for clinicians form submission</code> workflow.</span></div>
+    <div class="io-row"><span class="io-label">Profile</span><span class="io-val"><code>Clinician Info Form</code> → writes specialties / populations / modalities into the Clinicians object.</span></div>
+  </div>
+
+  <div class="callout">
+    <strong>The through-line:</strong> a person is discovered → contacts KP (phone tree / form / our tools) →
+    becomes an <strong>Opportunity in All Inquiries</strong> → the CCC Console + escalation engine work it →
+    the Matching Tool finds their clinician → scheduling &amp; paperwork → active client → retention.
+    Clinician availability that powers the match is kept current by clinicians themselves through the
+    Clinician Console. It's one connected loop.
+  </div>
+
+  <footer>Mapped from the Kentlands demo GoHighLevel account — no real client data · see the <a href="system-map.html">full System Map</a></footer>
+</div>
+
+</body>
+</html>
