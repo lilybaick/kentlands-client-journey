@@ -14,7 +14,8 @@ kentlands-client-journey/
     ├── journey-stages.md     ← Edit stage names, descriptions, and tags here
     ├── automations.md        ← Reference list of the big-rock GHL automations
     ├── phone-tree-script.md  ← The caller-facing phone menu, verbatim
-    └── phone-tree-detail.md  ← How the phone tree works (caller menu + CRM logic)
+    ├── phone-tree-detail.md  ← How the phone tree works (caller menu + CRM logic)
+    └── our-tools-and-ghl.md  ← How the 3 KP tools connect to GHL + full inventory
 ```
 
 ---
