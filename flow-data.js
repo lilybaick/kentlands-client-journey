@@ -89,11 +89,14 @@ window.JOURNEY = {
               sub: "Already a client",
               type: "decision",
               children: [
-                { id: "ex-urgent", label: "Urgent — today", type: "urgent", detail: ["Dedicated voicemail; team alerted right away"] },
-                { id: "ex-sched", label: "Book / cancel / reschedule", type: "stage" },
-                { id: "ex-meds", label: "Medication issues", type: "stage", detail: ["Med. management for current clients"] },
-                { id: "ex-records", label: "Records request", type: "stage", detail: ["Release of Information & Records Request form"] },
-                { id: "ex-billing", label: "Payment & billing", type: "stage", detail: ["Superbills live in the desktop patient portal"] }
+                { id: "ex-urgent", label: "Urgent — today", sub: "press 1", type: "urgent", detail: ["Dedicated voicemail; team alerted right away"] },
+                { id: "ex-sched", label: "Book / cancel / reschedule", sub: "press 2", type: "stage", detail: ["Coordinator handles it or routes to the calendar"] },
+                { id: "ex-newservice", label: "Set up a new service", sub: "press 3", type: "stage", detail: ["Adding therapy, meds, or testing to current care"] },
+                { id: "ex-meds", label: "Medication issues", sub: "press 4", type: "stage", detail: ["Med management for current clients"], children: [ { id: "ref-exmed", label: "→ Med Management", type: "ref", to: "med-mgmt" } ] },
+                { id: "ex-records", label: "Records request", sub: "press 5", type: "stage", detail: ["Release of Information & Records Request form"] },
+                { id: "ex-billing", label: "Payment & billing", sub: "press 6", type: "stage", detail: ["Superbills live in the desktop patient portal"] },
+                { id: "ex-other", label: "Anything else", sub: "press 7", type: "stage", detail: ["Message or route to the right admin"] },
+                { id: "ex-operator", label: "Operator", sub: "press 0 — anytime", type: "stage", detail: ["An available admin picks up if one's free"] }
               ]
             },
             { id: "biz-entry", label: "Business matters", sub: "Vendors, referrals", type: "stage", children: [ { id: "ref-biz", label: "→ Business pipeline", type: "ref", to: "business" } ] },

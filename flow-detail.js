@@ -167,5 +167,78 @@ window.FLOW_DETAIL = {
   ],
   "clinician-console": [
     { type: "tool", title: "Clinician self-service", body: "Clinicians sign in (email + last-4 of phone) and flip OPEN/FULL or edit their bio/age range. Availability writes straight to their GHL record and the matcher picks it up — so the public tool is always current." }
+  ],
+
+  /* ── Getting-in-touch extras ── */
+  "entry": [
+    { type: "behind", title: "The front door", body: "Every first contact — a call, text, email, web form, or one of our own tools — lands here and becomes an inquiry the team can work. Nothing is lost." }
+  ],
+  "ex-sched": [
+    { type: "behind", title: "Booking changes", body: "Book, cancel, or reschedule — a coordinator handles it or routes to the calendar. Cancellations can also come through the Cancellation Request form." }
+  ],
+  "ex-newservice": [
+    { type: "script", title: "Adding a service", body: "A current client asking to add something to their care — e.g. therapy + medication, or a testing evaluation. Routed to set up the new service." }
+  ],
+  "ex-other": [
+    { type: "behind", title: "Catch-all", body: "Anything the menu didn't cover — takes a message and routes it to the right admin so it still becomes a tracked inquiry." }
+  ],
+  "ex-operator": [
+    { type: "script", title: "Press 0 — anytime", body: "“…at any time you can press ZERO — and if an admin person is available, we'll pick up.” The escape hatch on every menu." }
+  ],
+  "biz-entry": [
+    { type: "behind", title: "Business inquiries", body: "Vendors, referral partners, and general business go to the BUSINESS pipeline — kept separate from the client journey." }
+  ],
+  "emp-entry": [
+    { type: "behind", title: "Hiring", body: "Job and internship inquiries route to the APPLICANTS pipeline (a full hiring flow, not a client inquiry)." }
+  ],
+
+  /* ── ② Inquiry journey ── */
+  "inquiry": [
+    { type: "behind", title: "The All Inquiries pipeline", body: "Once created, every inquiry moves through 16 stages here — worked by the coordinator team and the escalation engine so nothing goes stale." }
+  ],
+  "new-inquiry": [
+    { type: "behind", title: "Not yet contacted", body: "A fresh opportunity waiting for first contact. The escalation timers start ticking the moment it lands." }
+  ],
+  "lost": [
+    { type: "behind", title: "Done / Lost Lead", body: "The Lost Inquiry automation flips the contact type to archived. Kept for reporting and possible future re-engagement." }
+  ],
+
+  /* ── ③ Staying cared for ── */
+  "retention": [
+    { type: "behind", title: "Staying cared for", body: "After someone becomes a client, retention automations keep them supported and catch anyone quietly slipping away." }
+  ],
+  "new-clients": [
+    { type: "behind", title: "First 6 months", body: "New clients enter a dedicated pipeline for onboarding and early check-ins, ending in a 'Called for Feedback' touchpoint." }
+  ],
+  "med-mgmt": [
+    { type: "behind", title: "Current-client medication", body: "A current client's med request — via a form or a texted trigger link — creates an inquiry in the Med Management pipeline: New request → uncompleted form → completed." }
+  ],
+  "reactivation": [
+    { type: "behind", title: "Reactivation", body: "Clients waiting for a clinician's return (e.g. Reuven's) are tracked and re-booked when the clinician is back." }
+  ],
+
+  /* ── ④ Other journeys ── */
+  "other": [
+    { type: "note", title: "Non-client pipelines", body: "Business/vendor, referral outreach, and job/internship applicants each get their own pipeline, separate from the client journey." }
+  ],
+  "business": [
+    { type: "behind", title: "Business pipeline", body: "Vendors & referral contacts: New Lead → Contacted → Proposal Sent → Closed." }
+  ],
+  "referral": [
+    { type: "behind", title: "Referral outreach", body: "Proactive outreach to referral partners: New Lead → Contacted → Proposal → Closed." }
+  ],
+  "applicants": [
+    { type: "behind", title: "Hiring pipeline", body: "New Applicant → check SP for a former patient → Responded → Application → Interview → Offer → Onboarding." }
+  ],
+
+  /* ── Matching Tool extras ── */
+  "mt-care": [
+    { type: "behind", title: "Step 1 routes everything", body: "The type of care picked here shapes the whole result experience — a ranked therapy match, the full prescriber list, or the shared testing-team card." }
+  ],
+  "mt-therapy": [
+    { type: "tool", title: "How the therapy match works", body: "Ranks open clinicians by specialty, population, age, location and PSYPACT — plus a non-AI read of the client's own words against each bio. Always returns the best 1–3, never an empty screen." }
+  ],
+  "mt-insq": [
+    { type: "behind", title: "Insurance question", body: "Routes an insurance question to the team, tagged '— Insurance question' so it's answered fast." }
   ]
 };
