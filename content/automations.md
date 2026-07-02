@@ -15,6 +15,10 @@ Update this file when automations change in GHL.
 | Live chat to inquiry | ✅ Published | Live chat message |
 | Lead Filtering Phone System | ✅ Published | Inbound call |
 
+> 📞 The **Lead Filtering Phone System** is the front door and by far the most complex automation.
+> It has its own docs: **`phone-tree-script.md`** (the caller-facing menu, verbatim) and
+> **`phone-tree-detail.md`** (how the menu + CRM logic work together).
+
 ## Response & Follow-up
 | Automation | Status | Trigger |
 |---|---|---|

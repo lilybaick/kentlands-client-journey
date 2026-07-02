@@ -11,8 +11,10 @@ kentlands-client-journey/
 ├── index.html              ← The interactive webpage
 ├── README.md               ← This file
 └── content/
-    ├── journey-stages.md   ← Edit stage names, descriptions, and tags here
-    └── automations.md      ← Reference list of all GHL automations
+    ├── journey-stages.md     ← Edit stage names, descriptions, and tags here
+    ├── automations.md        ← Reference list of the big-rock GHL automations
+    ├── phone-tree-script.md  ← The caller-facing phone menu, verbatim
+    └── phone-tree-detail.md  ← How the phone tree works (caller menu + CRM logic)
 ```
 
 ---
