@@ -233,7 +233,13 @@ window.FLOW_DETAIL = {
 
   /* ── Matching Tool extras ── */
   "mt-care": [
-    { type: "behind", title: "Step 1 routes everything", body: "The type of care picked here shapes the whole result experience — a ranked therapy match, the full prescriber list, or the shared testing-team card." }
+    { type: "behind", title: "Step 1 routes everything", body: "The type of care picked here shapes the whole result experience — a ranked therapy match, the full prescriber list, or the shared testing-team card. Insurance isn't asked yet — that only comes at the end, when connecting." }
+  ],
+  "mt-needs": [
+    { type: "behind", title: "Step 2 · in your own words", body: "A free-text box the tool reads against each clinician's bio (non-AI keyword relevance), plus optional refine chips — specialty, population, age, format, PSYPACT." }
+  ],
+  "mt-results": [
+    { type: "tool", title: "Step 3 · the matches", body: "Therapy → ranked by fit; Medication → every available prescriber; Testing → the shared team card. Always the best 1–3, never an empty screen — a pending 'welcoming soon' tier appears if no one is open." }
   ],
   "mt-therapy": [
     { type: "tool", title: "How the therapy match works", body: "Ranks open clinicians by specialty, population, age, location and PSYPACT — plus a non-AI read of the client's own words against each bio. Always returns the best 1–3, never an empty screen." }

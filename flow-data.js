@@ -111,34 +111,38 @@ window.JOURNEY = {
           children: [
             {
               id: "matching-tool", label: "Clinician Matching Tool", sub: "Public self-serve search", type: "decision",
-              detail: ["3-step wizard: type of care → your needs → matched clinicians", "Always returns the best 1–3 — never a dead end"],
+              detail: ["A 3-step wizard, in order — the insurance step only comes at the very end, when you connect"],
               children: [
                 {
-                  id: "mt-care", label: "Pick type of care", sub: "Step 1 — routes everything", type: "decision",
+                  id: "mt-care", label: "Step 1 · Type of care", sub: "routes what you'll see", type: "decision",
+                  detail: ["Therapy (individual · minor · couples · family) · Medication · Testing"],
                   children: [
-                    { id: "mt-therapy", label: "Therapy", sub: "individual · minor · couples · family", type: "stage",
-                      detail: ["Ranked by specialty, population, age, location, PSYPACT", "Also reads your own words against each bio for fit"],
-                      children: [ { id: "ref-mt-therapy", label: "→ Connect / book", type: "ref", to: "mt-book" } ] },
-                    { id: "mt-medication", label: "Medication", sub: "psychiatry", type: "stage",
-                      detail: ["Shows every available prescriber (Dr. Kress, Dr. Donmoyer)"],
-                      children: [ { id: "ref-mt-med", label: "→ Connect / book", type: "ref", to: "mt-book" } ] },
-                    { id: "mt-testing", label: "Testing & assessment", sub: "$4,320 program", type: "stage",
-                      detail: ["Shared Testing Team card — always shown, even when full", "Reach out → coordinator sets up the discovery call"],
-                      children: [ { id: "ref-mt-test", label: "→ Connect / book", type: "ref", to: "mt-book" } ] }
-                  ]
-                },
-                {
-                  id: "mt-book", label: "Connect with the clinician", sub: "the insurance fork", type: "decision",
-                  detail: ["Out-of-network disclaimer first: KP is private, fee-for-service"],
-                  children: [
-                    { id: "mt-oop", label: "Comfortable paying out of pocket", type: "milestone",
-                      detail: ["Prefilled text or HIPAA form (no PHI on our side)", "Superbill provided for out-of-network reimbursement"],
-                      children: [ { id: "ref-mt-oop", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
-                    { id: "mt-innet", label: "Prefer to stay in-network", type: "stage",
-                      detail: ["Shifts to an in-network referral request — the team helps find someone"],
-                      children: [ { id: "ref-mt-innet", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
-                    { id: "mt-insq", label: "Insurance question", type: "stage",
-                      children: [ { id: "ref-mt-insq", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] }
+                    {
+                      id: "mt-needs", label: "Step 2 · Your needs", sub: "in your own words", type: "stage",
+                      detail: ["Free-text summary + optional refine chips (specialty, population, age, format, PSYPACT)"],
+                      children: [
+                        {
+                          id: "mt-results", label: "Step 3 · Matched clinicians", sub: "the best 1–3", type: "stage",
+                          detail: ["Therapy → ranked by fit + your words vs each bio", "Medication → every available prescriber", "Testing → shared team card ($4,320)", "Always the best 1–3 — never a dead end"],
+                          children: [
+                            {
+                              id: "mt-book", label: "Connect with the clinician", sub: "the insurance fork — only at booking", type: "decision",
+                              detail: ["Triggered when you click 'Connect' on a match", "Out-of-network disclaimer shown first: KP is private, fee-for-service"],
+                              children: [
+                                { id: "mt-oop", label: "Comfortable paying out of pocket", type: "milestone",
+                                  detail: ["Prefilled text or HIPAA form (no PHI on our side)", "Superbill provided for out-of-network reimbursement"],
+                                  children: [ { id: "ref-mt-oop", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
+                                { id: "mt-innet", label: "Prefer to stay in-network", type: "stage",
+                                  detail: ["Shifts to an in-network referral request — the team helps find someone"],
+                                  children: [ { id: "ref-mt-innet", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
+                                { id: "mt-insq", label: "Insurance question", type: "stage",
+                                  children: [ { id: "ref-mt-insq", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               ]
