@@ -363,6 +363,45 @@ footer { text-align: center; margin-top: 40px; font-size: 0.74rem; color: #bbb; 
 @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
 .stage:nth-child(1){animation-delay:.05s} .stage:nth-child(3){animation-delay:.12s} .stage:nth-child(5){animation-delay:.19s} .stage:nth-child(7){animation-delay:.26s} .stage:nth-child(9){animation-delay:.33s} .stage:nth-child(11){animation-delay:.40s} .stage:nth-child(13){animation-delay:.47s} .stage:nth-child(15){animation-delay:.54s}
 
+/* ── Node detail drawer (journey.html) ─────────────── */
+.node-drawer {
+  position: fixed; top: var(--nav-h); right: 0; bottom: 0;
+  width: min(400px, 92vw); background: #fff; border-left: 1.5px solid var(--border);
+  box-shadow: -12px 0 44px rgba(0,0,0,0.13); z-index: 60;
+  transform: translateX(112%); transition: transform 0.32s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.node-drawer.open { transform: translateX(0); }
+.nd-close { position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: #fff; color: #6a5a4e; cursor: pointer; font-size: 0.85rem; z-index: 2; }
+.nd-close:hover { border-color: var(--brown); color: var(--brown); }
+.nd-head { display: flex; align-items: center; gap: 12px; padding: 22px 52px 16px 24px; border-bottom: 1px solid var(--border); }
+.nd-ic { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+.nd-head-txt h3 { font-size: 1.15rem; color: #3a3a3a; letter-spacing: 0.01em; }
+.nd-head-txt p { font-size: 0.82rem; color: var(--muted); font-style: italic; margin-top: 2px; }
+.nd-body { padding: 18px 22px 44px; overflow-y: auto; }
+.nd-path { font-size: 0.66rem; letter-spacing: 0.04em; text-transform: uppercase; color: #b0a89f; margin-bottom: 16px; line-height: 1.6; }
+.nd-mod { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; background: #fff; }
+.nd-mod-h { font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: #6a5a4e; font-weight: 600; margin-bottom: 8px; }
+.nd-mod-b { font-size: 0.92rem; color: #4a4038; line-height: 1.55; }
+.nd-ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.nd-ul li { position: relative; padding-left: 14px; }
+.nd-ul li::before { content: "·"; position: absolute; left: 3px; color: var(--brown); font-weight: 700; }
+.nd-mod-link { display: inline-block; margin-top: 11px; font-size: 0.82rem; font-weight: 600; color: #2a5a8c;
+  background: #eef4fb; border: 1px solid #c3daf5; border-radius: 8px; padding: 8px 13px; text-decoration: none; }
+.nd-mod-link:hover { background: #e0edfa; border-color: #a9cdf0; }
+.nd-mod.m-script { background: var(--brown-bg); border-color: #e6d9cd; }
+.nd-mod.m-script .nd-mod-b { font-style: italic; color: #5a4a42; }
+.nd-mod.m-behind { background: #f5f9fd; border-color: #d3e3f2; }
+.nd-mod.m-textback { background: #f3fbf4; border-color: #c3e6c9; }
+.nd-mod.m-serve, .nd-mod.m-note { background: #fbf9f6; }
+.nd-empty { color: var(--muted); font-size: 0.88rem; font-style: italic; padding: 8px 0; }
+@media (max-width: 620px) {
+  .node-drawer { width: 100%; top: auto; height: 84vh; border-left: none; border-top: 1.5px solid var(--border);
+    border-radius: 18px 18px 0 0; transform: translateY(112%); }
+  .node-drawer.open { transform: translateY(0); }
+}
+
 /* ── Journey Blueprint (blueprint.html) ─────────────── */
 
 /* mode toggle */
