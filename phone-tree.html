@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Phone Tree — Kentlands Psychotherapy</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html"><span class="dot"></span> Kentlands Psychotherapy</a>
+  <a class="nav-link" href="index.html">Overview</a>
+  <a class="nav-link" href="journey.html">Journey</a>
+  <a class="nav-link active" href="phone-tree.html">Phone Tree</a>
+  <a class="nav-link" href="tools.html">Tools <span class="lock">🔒</span></a>
+  <a class="nav-link" href="system-map.html">System Map <span class="lock">🔒</span></a>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>The Phone Tree</h1>
+    <p class="lede">The front door of the whole journey. Press the numbers to walk the menu a caller actually hears — and see what the CRM does behind the scenes at each step.</p>
+  </header>
+
+  <div class="phone-shell">
+    <div class="dialpad-crumbs" id="crumbs"></div>
+    <div id="node"></div>
+  </div>
+
+  <div class="section-title">Good to know</div>
+  <div class="phone-shell">
+    <div class="callout" style="font-style:normal;font-size:0.88rem;">
+      <p><strong>Admin hours</strong> are generally Monday–Friday, 9:30&nbsp;AM–5&nbsp;PM. For a non-emergency after-hours matter, existing clients reach their clinician through the SimplePractice patient portal.</p>
+      <p style="margin-top:8px;"><strong>In an emergency, call 911 first.</strong> Then you can follow the menu and leave a message.</p>
+      <p style="margin-top:8px;">Kentlands Psychotherapy is a <strong>private, out-of-network, fee-for-service</strong> practice — not in-network with insurance. It provides monthly superbills so clients can seek out-of-network reimbursement.</p>
+    </div>
+  </div>
+
+  <footer>The caller wording here mirrors the recorded menu. See how the calls become CRM records on the <a href="system-map.html">System Map</a>.</footer>
+</div>
+
+<script>
+/* ── The menu tree. Each node: caption + optional keys / outcome / crm. ── */
+const NODES = {
+  main: {
+    speaker: "Recorded greeting",
+    caption: "You've reached the offices of Kentlands Psychotherapy —",
+    crm: "Every call is screened for spam / unwanted business, classified by why they're calling, and recorded — the workflow creates or updates an Opportunity in the All Inquiries pipeline so nothing is lost.",
+    keys: [
+      { n: "1", title: "Existing Client", sub: "Already a client here", goto: "existing" },
+      { n: "2", title: "New Client", sub: "New to the practice", goto: "new" },
+      { n: "3", title: "Business matters", sub: "Vendors, referrals, partnerships", goto: "business" },
+      { n: "4", title: "Employment or Training", sub: "Jobs & internships", goto: "employment" },
+      { n: "5", title: "Anything Else", sub: "", goto: "anything" }
+    ]
+  },
+
+  /* 1 — Existing client */
+  existing: {
+    speaker: "Recorded menu",
+    caption: "Let's make sure we get you to the right person. At any time you can press 0 and, if an admin is available, we'll pick up.",
+    keys: [
+      { n: "1", title: "Urgent — appointment today", sub: "Something urgent about a session scheduled for today", goto: "ex_urgent" },
+      { n: "2", title: "Book, cancel or reschedule", goto: "ex_sched" },
+      { n: "3", title: "Set up a new service", goto: "ex_new" },
+      { n: "4", title: "Medication issues", goto: "ex_meds" },
+      { n: "5", title: "Records request", goto: "ex_records" },
+      { n: "6", title: "Payment, billing, receipts", goto: "ex_billing" },
+      { n: "7", title: "Anything else", goto: "ex_other" },
+      { n: "0", title: "Operator", sub: "Reach an available admin", goto: "ex_operator" }
+    ]
+  },
+  ex_urgent: { caption: "Urgent — today's appointment", outcome: "Routes to a dedicated voicemail (\"If you're hearing this…\") so the team is alerted right away.", crm: "Flagged for immediate pickup." },
+  ex_sched: { caption: "Book / cancel / reschedule", outcome: "Handled by the scheduling desk. A cancellation submitted online also fires the Cancellation Request workflow.", crm: "Cancellation Request Webform → OPP Creation & Notification." },
+  ex_new: { caption: "Inquire about a new service", outcome: "Connects the current client to set up an additional service." },
+  ex_meds: { caption: "Medication issues", outcome: "Routes to medication management for current clients.", crm: "Current Client Med. Mng. — trigger link + form submission." },
+  ex_records: { caption: "Records request", outcome: "Directs to the Release of Information & Records Request Form.", crm: "Records Request Form → notification & opportunity creation." },
+  ex_billing: { caption: "Payment, billing, medical receipts", outcome: "Routes to billing. Superbills (monthly cumulative receipts) live in the desktop patient portal." },
+  ex_other: { caption: "Anything else", outcome: "Rings the desk, or takes a message if no one is available." },
+  ex_operator: { caption: "Operator", outcome: "If an admin is available, the call is picked up live." },
+
+  /* 2 — New client */
+  new: {
+    speaker: "Dr. Elizabeth Carr, Founder",
+    caption: "Welcome. A reminder that Kentlands Psychotherapy is private and fee-for-service — we are not in-network with insurance, but we provide medical receipts (superbills) for out-of-network reimbursement. What brings you in today?",
+    crm: "The New-Client branch pre-qualifies callers by insurance so the team spends its time on good-fit leads.",
+    keys: [
+      { n: "1", title: "Medicare / Medicaid / Tricare / HMO", sub: "Government or HMO coverage", goto: "ins_public" },
+      { n: "2", title: "Traditional insurance", sub: "BC/BS, Aetna, Cigna, United — learn about OON benefits", goto: "traditional" },
+      { n: "3", title: "Find a good-fit therapist", sub: "For yourself or a loved one", goto: "therapist" },
+      { n: "4", title: "Psychiatric evaluation / medication", goto: "prescriber" },
+      { n: "5", title: "Testing services", goto: "testing" },
+      { n: "6", title: "Something else", goto: "new_other" }
+    ]
+  },
+
+  /* 2 → 1 insurance sub-tree (the real lead filter) */
+  ins_public: {
+    speaker: "Recorded menu",
+    caption: "Which best describes your coverage?",
+    keys: [
+      { n: "1", title: "Medicare", goto: "ins_medicare" },
+      { n: "2", title: "Medicaid", goto: "ins_medicaid" },
+      { n: "3", title: "Tricare", goto: "ins_tricare" },
+      { n: "4", title: "HMO (e.g. Kaiser)", goto: "ins_hmo" },
+      { n: "5", title: "Other traditional insurance", sub: "BC/BS, Aetna, Cigna", goto: "traditional" },
+      { n: "6", title: "Schedule a call back", goto: "ins_callback" },
+      { n: "7", title: "Back to main menu", goto: "main" }
+    ]
+  },
+  ins_medicare: { caption: "Medicare", serve: "maybe", serveText: "Private pay only", outcome: "Our providers have opted out of Medicare, so services are private pay. You can learn about private pay, or we'll text you a Psychology Today link pre-filtered for Gaithersburg + Medicare.", crm: "Texts a pre-filtered referral-out link so even a \"no\" leaves a real next step." },
+  ins_medicaid: { caption: "Medicaid", serve: "no", serveText: "Cannot serve — even self-pay", outcome: "Due to federal compliance rules, we cannot serve Medicaid clients at all, even self-pay, with no exceptions. We'll text you a Psychology Today link filtered for Medicaid providers.", crm: "Texts a Medicaid referral-out link." },
+  ins_tricare: { caption: "Tricare", serve: "no", serveText: "Referred out", outcome: "Non-participating registration is too onerous to maintain, so we refer Tricare callers out. We'll text you a Psychology Today link filtered for Tricare.", crm: "Texts a Tricare referral-out link." },
+  ins_hmo: { caption: "HMO (Kaiser)", serve: "maybe", serveText: "Private pay only", outcome: "We're not in HMO networks, so services are private pay. Some clients successfully petition their HMO for out-of-network reimbursement — it's worth self-advocating for a written OON agreement.", crm: "Sets Contact Type = Lead; can route to the OON info branch." },
+  ins_callback: { caption: "Schedule a call back", outcome: "Leave your name, a call-back number, good times to reach you, and the details of your insurance question." },
+
+  /* 2 → 2 traditional insurance / superbills */
+  traditional: {
+    speaker: "Recorded menu",
+    caption: "With traditional insurance you'd register, keep a card on file, be charged the day of service, and receive a monthly cumulative receipt — a Superbill — in the patient portal. Submit the Superbill (not the app's invoices) to your insurer for out-of-network reimbursement.",
+    keys: [
+      { n: "1", title: "Text me the insurance info link", goto: "trad_link" }
+    ]
+  },
+  trad_link: { caption: "Insurance info link", outcome: "Texts you kentlandspsychotherapy.com/contact-us…/insurance-info/ with the full out-of-network explanation.", crm: "Trigger link click is tracked in GHL." },
+
+  therapist: { caption: "Find a good-fit therapist", outcome: "\"We'll find the best therapist for your needs — transferring you now.\" You can also use our online Clinician Matching Tool.", crm: "Tags the call, sets Contact Type = Lead, and (via the matching form) creates an Opportunity in All Inquiries." },
+
+  /* 2 → 4 prescriber */
+  prescriber: {
+    speaker: "Recorded menu",
+    caption: "We have two prescribers: Dr. Adrian Kress, an MD psychiatrist, and Dr. Brent Donmoyer, a doctoral-level Psychiatric Mental Health Nurse Practitioner.",
+    keys: [
+      { n: "1", title: "Text fees & info — Dr. Kress", goto: "presc_leaf" },
+      { n: "2", title: "Text fees & info — Dr. Donmoyer", goto: "presc_leaf" },
+      { n: "3", title: "Text info on both", goto: "presc_leaf" },
+      { n: "4", title: "Talk to someone now about fit", goto: "presc_talk" }
+    ]
+  },
+  presc_leaf: { caption: "Prescriber info", outcome: "Texts you the requested fees and information.", crm: "Trigger link click tracked; inquiry logged." },
+  presc_talk: { caption: "Talk about prescriber fit", outcome: "Connects you with the team to discuss which prescriber fits your needs." },
+
+  /* 2 → 5 testing */
+  testing: {
+    speaker: "Recorded menu",
+    caption: "Our comprehensive testing program is about 20 hours of psychologist time — a free 20-minute consult, a 1-hour pre-meeting, two half-days of testing, and a results meeting about a month later with a written report. The package is $4,320 (half deposit at booking, half the day before).",
+    keys: [
+      { n: "1", title: "Talk to a client-care coordinator", sub: "Set up a discovery call", goto: "testing_leaf" }
+    ]
+  },
+  testing_leaf: { caption: "Testing — discovery call", outcome: "Connects you with a client-care coordinator to set up a discovery call.", crm: "Testing Form → OPP Creation & Notification; reads the Testing Availabilities object for scheduling." },
+  new_other: { caption: "Something else", outcome: "Goes straight to the ring desk or voicemail so the team can follow up." },
+
+  /* 3 / 4 / 5 top-level branches */
+  business: { caption: "Business related matters", outcome: "Vendor, referral and partnership inquiries are routed to the business team.", crm: "Feeds the BUSINESS — Vendor & Referral Contacts pipeline; contact-type/tag syncing applies." },
+  employment: { caption: "Employment or Training opportunities", outcome: "Job and internship inquiries are routed to hiring.", crm: "Feeds the APPLICANTS — Job or Internship pipeline." },
+  anything: { caption: "Anything Else", outcome: "Rings the desk, or takes a message if no one is available.", crm: "Still creates/updates an Inquiry so the team can follow up." }
+};
+
+/* ── Render engine ── */
+let stack = ["main"];
+
+function serveClass(s){ return s === "yes" ? "serve-yes" : s === "no" ? "serve-no" : "serve-maybe"; }
+function serveIcon(s){ return s === "yes" ? "✅" : s === "no" ? "⛔" : "⚠️"; }
+
+function render() {
+  const id = stack[stack.length - 1];
+  const node = NODES[id];
+  const nodeEl = document.getElementById("node");
+  const crumbEl = document.getElementById("crumbs");
+
+  // breadcrumbs
+  crumbEl.innerHTML = "";
+  stack.forEach((sid, i) => {
+    if (i > 0) { const s = document.createElement("span"); s.className = "sep"; s.textContent = "›"; crumbEl.appendChild(s); }
+    const b = document.createElement("button");
+    b.textContent = i === 0 ? "Start" : (NODES[sid].caption.length > 26 ? NODES[sid].caption.slice(0,26) + "…" : NODES[sid].caption);
+    b.onclick = () => { stack = stack.slice(0, i + 1); render(); };
+    crumbEl.appendChild(b);
+  });
+
+  let html = "";
+  html += '<div class="menu-caption">';
+  if (node.speaker) html += '<span class="speaker">' + node.speaker + '</span>';
+  html += node.caption + '</div>';
+
+  if (node.serve) {
+    html += '<p class="outcome-note ' + serveClass(node.serve) + '"><strong>' + serveIcon(node.serve) + ' ' + node.serveText + '</strong></p>';
+  }
+  if (node.outcome) html += '<p class="outcome-note">' + node.outcome + '</p>';
+  if (node.crm) html += '<div class="crm-note">' + node.crm + '</div>';
+
+  if (node.keys) {
+    html += '<div class="keys">';
+    node.keys.forEach(k => {
+      html += '<button class="key" onclick="go(\'' + k.goto + '\')">'
+        + '<span class="key-num">' + k.n + '</span>'
+        + '<span class="key-body"><span class="k-title">' + k.title + '</span>'
+        + (k.sub ? '<span class="k-sub">' + k.sub + '</span>' : '')
+        + '</span><span class="k-arrow">›</span></button>';
+    });
+    html += '</div>';
+  } else {
+    // leaf — offer a way back
+    html += '<div class="keys"><button class="key" onclick="back()">'
+      + '<span class="key-num">↩</span>'
+      + '<span class="key-body"><span class="k-title">Back</span></span></button>'
+      + '<button class="key" onclick="reset()">'
+      + '<span class="key-num">⟲</span>'
+      + '<span class="key-body"><span class="k-title">Start over</span></span></button></div>';
+  }
+  nodeEl.innerHTML = html;
+  nodeEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function go(id){
+  if (!NODES[id]) return;
+  const idx = stack.indexOf(id);
+  if (idx !== -1) { stack = stack.slice(0, idx + 1); }  // jump back if already visited
+  else { stack.push(id); }
+  render();
+}
+function back(){ if (stack.length > 1) { stack.pop(); render(); } }
+function reset(){ stack = ["main"]; render(); }
+render();
+</script>
+</body>
+</html>
