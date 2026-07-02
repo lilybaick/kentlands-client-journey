@@ -396,6 +396,35 @@ footer { text-align: center; margin-top: 40px; font-size: 0.74rem; color: #bbb; 
 .nd-mod.m-textback { background: #f3fbf4; border-color: #c3e6c9; }
 .nd-mod.m-serve, .nd-mod.m-note { background: #fbf9f6; }
 .nd-empty { color: var(--muted); font-size: 0.88rem; font-style: italic; padding: 8px 0; }
+
+/* clickable breadcrumb */
+.nd-crumb { font-family: inherit; font-size: 0.64rem; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--brown); background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; }
+.nd-crumb:hover { color: #5a4436; }
+.nd-crumb.cur { color: #b0a89f; text-decoration: none; cursor: default; }
+.nd-crumb-sep { color: #d0c6bb; margin: 0 5px; }
+
+/* copy button on script / text-back modules */
+.nd-copy { margin-top: 11px; font-family: inherit; font-size: 0.72rem; color: #6a5a4e;
+  background: #fff; border: 1px solid var(--border); border-radius: 7px; padding: 5px 11px; cursor: pointer; transition: all 0.15s; }
+.nd-copy:hover { border-color: var(--brown); color: var(--brown); }
+.nd-copy.ok { color: #2a6e3a; border-color: #b8dfc0; background: #f0faf0; }
+
+/* "where this leads" next-step buttons */
+.nd-next { margin-top: 8px; }
+.nd-next-h { font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: #6a5a4e; font-weight: 600; margin-bottom: 9px; }
+.nd-next-btn { display: block; width: 100%; text-align: left; font-family: inherit; font-size: 0.9rem; color: #3a3a3a;
+  background: #faf8f5; border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 13px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+.nd-next-btn:hover { border-color: var(--brown); background: var(--brown-bg); }
+.nd-next-btn em { color: var(--muted); font-size: 0.8rem; font-style: italic; }
+.nd-next-btn .arw { float: right; color: var(--brown); font-weight: 700; }
+
+/* node badge + active ring (flow chart cards) */
+.detail-badge { position: absolute; top: 7px; right: 12px; font-size: 0.72rem; opacity: 0.4; transition: opacity 0.2s; pointer-events: none; }
+.node-card:hover .detail-badge { opacity: 0.95; }
+.node-card.drawer-active { border-color: var(--brown) !important;
+  box-shadow: 0 0 0 2px rgba(140,111,94,0.6), 0 8px 26px rgba(140,111,94,0.28) !important; }
+.flow-inner.has-selection .node-card.drawer-active { opacity: 1; }
 @media (max-width: 620px) {
   .node-drawer { width: 100%; top: auto; height: 84vh; border-left: none; border-top: 1.5px solid var(--border);
     border-radius: 18px 18px 0 0; transform: translateY(112%); }

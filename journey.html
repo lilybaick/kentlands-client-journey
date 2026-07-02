@@ -89,6 +89,7 @@ const zlabel  = document.getElementById("zlabel");
 const byId    = {};
 let scale = 1;
 let selectedId = null;
+let openId = null;
 
 /* init: index nodes, set parents/depth, open the top two levels by default */
 (function init(node, parent, depth) {
@@ -110,6 +111,9 @@ function buildNode(node) {
   const card = document.createElement("div");
   card.className = "node-card type-" + (node.type || "stage");
   card.dataset.id = node.id;
+  const hasDetail = !!(window.FLOW_DETAIL && FLOW_DETAIL[node.id]);
+  if (hasDetail) card.classList.add("has-detail");
+  if (node.id === openId) card.classList.add("drawer-active");
 
   let html = '<div class="n-label">' + node.label + '</div>';
   if (node.sub) html += '<div class="n-sub">' + node.sub + '</div>';
@@ -117,6 +121,7 @@ function buildNode(node) {
     html += '<div class="n-detail">' + node.detail.map(d => '<div>' + d + '</div>').join('') + '</div>';
   }
   card.innerHTML = html;
+  if (hasDetail) { const b = document.createElement("span"); b.className = "detail-badge"; b.textContent = "💬"; b.title = "Click for its script & details"; card.appendChild(b); }
 
   if (node.type === "ref" && node.to) {
     card.addEventListener("click", (e) => { e.stopPropagation(); jumpTo(node.to); });
@@ -263,6 +268,7 @@ const MOD_META = {
 const clean = s => String(s).replace(/^[①②③④⑤⑥⑦⑧⑨]\s*/, "");
 function openDrawer(id) {
   const n = byId[id]; if (!n) return;
+  openId = id;
   document.getElementById("nd-ic").style.background = TYPE_COLORS[n.type] || "#8c6f5e";
   document.getElementById("nd-title").textContent = clean(n.label);
   document.getElementById("nd-sub").textContent = n.sub || "";
@@ -274,6 +280,7 @@ function openDrawer(id) {
       let s = '<div class="nd-mod m-' + m.type + '"><div class="nd-mod-h">' + t.ic + '  ' + (m.title || t.label) + '</div>';
       s += '<div class="nd-mod-b">' + m.body + '</div>';
       if (m.link) s += '<a class="nd-mod-link" href="' + m.link + '" target="_blank" rel="noopener">' + (m.linkLabel || "Open") + ' ↗</a>';
+      if (m.type === "script" || m.type === "textback") s += '<button class="nd-copy" onclick="copyMod(this)" title="Copy to clipboard">⧉ Copy</button>';
       return s + '</div>';
     }).join("");
   } else if (n.detail && n.detail.length) {
@@ -281,11 +288,51 @@ function openDrawer(id) {
   } else {
     html = '<div class="nd-empty">No extra detail for this step yet — add it in <code>flow-detail.js</code>.</div>';
   }
-  const chain = ancestors(id).reverse().map(x => clean(x.label)).join("  ›  ");
-  document.getElementById("nd-body").innerHTML = '<div class="nd-path">' + chain + '</div>' + html;
+  // clickable breadcrumb
+  const chainNodes = ancestors(id).reverse();
+  const crumbs = chainNodes.map((x, i) => i === chainNodes.length - 1
+    ? '<span class="nd-crumb cur">' + clean(x.label) + '</span>'
+    : '<button class="nd-crumb" onclick="navTo(\'' + x.id + '\')">' + clean(x.label) + '</button>'
+  ).join('<span class="nd-crumb-sep">›</span>');
+  // "where this leads" — jump to child steps
+  let next = "";
+  const kids = n.children || [];
+  if (kids.length) {
+    next = '<div class="nd-next"><div class="nd-next-h">Where this leads</div>' +
+      kids.map(c => { const tid = (c.type === "ref" && c.to) ? c.to : c.id;
+        return '<button class="nd-next-btn" onclick="navTo(\'' + tid + '\')">' + clean(c.label) +
+          (c.sub ? ' <em>' + c.sub + '</em>' : '') + '<span class="arw">→</span></button>'; }).join("") +
+      '</div>';
+  }
+  document.getElementById("nd-body").innerHTML = '<div class="nd-path">' + crumbs + '</div>' + html + next;
+  document.getElementById("nd-body").scrollTop = 0;
   document.getElementById("node-drawer").classList.add("open");
+  treeEl.querySelectorAll(".node-card.drawer-active").forEach(c => c.classList.remove("drawer-active"));
+  const cardEl = treeEl.querySelector('.node-card[data-id="' + id + '"]'); if (cardEl) cardEl.classList.add("drawer-active");
 }
-function closeDrawer() { document.getElementById("node-drawer").classList.remove("open"); }
+function closeDrawer() {
+  openId = null;
+  document.getElementById("node-drawer").classList.remove("open");
+  treeEl.querySelectorAll(".node-card.drawer-active").forEach(c => c.classList.remove("drawer-active"));
+}
+function navTo(id) { jumpTo(id); openDrawer(id); }
+function copyMod(btn) {
+  const body = btn.closest(".nd-mod").querySelector(".nd-mod-b"); if (!body) return;
+  const txt = body.innerText.replace(/^[“"]+|[”"]+$/g, "").trim();
+  const done = () => { btn.textContent = "Copied ✓"; btn.classList.add("ok"); setTimeout(() => { btn.textContent = "⧉ Copy"; btn.classList.remove("ok"); }, 1400); };
+  const fail = () => { btn.textContent = "Select & ⌘/Ctrl-C"; setTimeout(() => { btn.textContent = "⧉ Copy"; }, 1800); };
+  const fallback = () => {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = txt; ta.style.position = "fixed"; ta.style.top = "-1000px"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      const ok = document.execCommand("copy"); document.body.removeChild(ta);
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(fallback);
+  else fallback();
+}
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawer(); });
 
 /* ── search (best-idea #3) ──────────────── */
