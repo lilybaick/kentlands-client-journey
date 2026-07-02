@@ -9,7 +9,8 @@ An interactive visual map of how a prospective client becomes a long-term client
 | Page | What it is | Audience |
 |---|---|---|
 | `index.html` | Overview hub — the "one connected loop" and links to everything | Everyone |
-| `journey.html` | Interactive flow chart of **all** client journeys (expandable) | Everyone |
+| `journey.html` | Interactive flow chart of **all** client journeys (expandable, searchable, zoom/pan, fullscreen) | Everyone |
+| `blueprint.html` | Service-blueprint journey map — client actions + an **emotion curve** above the line, GHL/team backstage below | Everyone |
 | `phone-tree.html` | Interactive phone menu — the front door, with what the CRM does at each step | Everyone |
 | `tools.html` | The 3 custom KP tools and how each connects to GHL | 🔒 Internal reference |
 | `system-map.html` | Full GHL inventory dashboard + automations, with a live data snapshot | 🔒 Internal reference |
@@ -26,11 +27,13 @@ An interactive visual map of how a prospective client becomes a long-term client
 kentlands-client-journey/
 ├── index.html            ← Overview hub
 ├── journey.html          ← Interactive flow chart of all journeys
+├── blueprint.html        ← Service-blueprint journey map (emotion curve + frontstage/backstage)
 ├── phone-tree.html       ← Interactive phone tree
 ├── tools.html            ← The 3 KP tools + GHL  (internal)
 ├── system-map.html       ← GHL inventory dashboard (internal)
 ├── styles.css            ← Shared design system
 ├── flow-data.js          ← The journey flow chart, as editable data (see below)
+├── blueprint-data.js     ← The blueprint stages, as editable data
 ├── README.md             ← This file
 └── content/              ← Plain-text source of truth (edit here, ask Claude to regenerate)
     ├── journey-stages.md

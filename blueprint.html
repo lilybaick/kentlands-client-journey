@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Journey Blueprint — Kentlands Psychotherapy</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html"><span class="dot"></span> Kentlands Psychotherapy</a>
+  <a class="nav-link" href="index.html">Overview</a>
+  <a class="nav-link" href="journey.html">Journey</a>
+  <a class="nav-link active" href="blueprint.html">Blueprint</a>
+  <a class="nav-link" href="phone-tree.html">Phone Tree</a>
+  <a class="nav-link" href="tools.html">Tools <span class="lock">🔒</span></a>
+  <a class="nav-link" href="system-map.html">System Map <span class="lock">🔒</span></a>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>The Journey Blueprint</h1>
+    <p class="lede">The same journey seen as a service blueprint — what the client <em>does and feels</em> above the line, and what the system quietly does <em>below</em> it. Hover a stage to focus it.</p>
+  </header>
+
+  <div class="bp-legend">
+    <span><span class="bp-key front"></span> Frontstage — what the client experiences</span>
+    <span><span class="bp-key back"></span> Backstage — what GHL &amp; the team do, unseen</span>
+  </div>
+
+  <div class="bp-scroll" id="bp-scroll">
+    <div class="bp-grid" id="bp-grid"><!-- built by JS --></div>
+  </div>
+
+  <footer>The dip at First Contact &amp; Paperwork is where clients are most likely to drop — that's where the automations work hardest · edit <code>blueprint-data.js</code> to change this map</footer>
+</div>
+
+<script src="blueprint-data.js"></script>
+<script>
+const grid = document.getElementById("bp-grid");
+const scroller = document.getElementById("bp-scroll");
+const N = BLUEPRINT.length;
+
+// column template: sticky label column + one column per stage
+grid.style.gridTemplateColumns = "var(--lane-w) repeat(" + N + ", minmax(190px, 1fr))";
+
+function cell(cls, html) { return '<div class="bp-cell ' + cls + '">' + html + '</div>'; }
+function lane(label, sub) { return '<div class="bp-lane-label"><span class="ll-title">' + label + '</span>' + (sub ? '<span class="ll-sub">' + sub + '</span>' : '') + '</div>'; }
+function list(items) { return '<ul class="bp-list">' + items.map(i => '<li>' + i + '</li>').join('') + '</ul>'; }
+
+let html = "";
+
+// ── Row 1: stage headers ───────────────────────────────
+html += '<div class="bp-lane-label bp-corner">Stage</div>';
+BLUEPRINT.forEach((s, i) => {
+  html += '<div class="bp-cell bp-head" data-col="' + i + '"><span class="bp-ic">' + s.icon + '</span><span class="bp-stage-name">' + s.name + '</span></div>';
+});
+
+// ── Row 2: client actions ──────────────────────────────
+html += lane("What the client does", "frontstage");
+BLUEPRINT.forEach((s, i) => html += '<div class="bp-cell front" data-col="' + i + '">' + list(s.client) + '</div>');
+
+// ── Row 3: touchpoints ─────────────────────────────────
+html += lane("Touchpoints", "channels");
+BLUEPRINT.forEach((s, i) => html += '<div class="bp-cell front" data-col="' + i + '"><div class="bp-tags">' + s.touch.map(t => '<span class="bp-tag">' + t + '</span>').join('') + '</div></div>');
+
+// ── Row 4: emotion curve (single spanning cell w/ svg) ─
+html += lane("How it feels", "emotion");
+html += '<div class="bp-emotion" id="bp-emotion" style="grid-column: 2 / -1;"><svg id="bp-emo-svg"></svg></div>';
+
+// ── line of visibility ─────────────────────────────────
+html += '<div class="bp-visibility" style="grid-column: 1 / -1;"><span>— line of visibility —</span></div>';
+
+// ── Row 5: backstage (GHL) ─────────────────────────────
+html += lane("Behind the scenes", "GHL + team");
+BLUEPRINT.forEach((s, i) => html += '<div class="bp-cell back" data-col="' + i + '">' + list(s.backstage) + '</div>');
+
+// ── Row 6: active KP tool ──────────────────────────────
+html += lane("KP tool at work", "our software");
+BLUEPRINT.forEach((s, i) => html += '<div class="bp-cell back" data-col="' + i + '">' + (s.tool ? '<span class="bp-tool">' + s.tool + '</span>' : '<span class="bp-none">—</span>') + '</div>');
+
+grid.innerHTML = html;
+
+// ── column focus on hover ──────────────────────────────
+grid.addEventListener("mouseover", e => {
+  const c = e.target.closest("[data-col]"); if (!c) return;
+  const col = c.dataset.col;
+  grid.querySelectorAll("[data-col]").forEach(el => el.classList.toggle("col-focus", el.dataset.col === col));
+});
+grid.addEventListener("mouseleave", () => grid.querySelectorAll(".col-focus").forEach(el => el.classList.remove("col-focus")));
+
+// ── draw the emotion curve ─────────────────────────────
+function drawEmotion() {
+  const host = document.getElementById("bp-emotion");
+  const svg = document.getElementById("bp-emo-svg");
+  const w = host.clientWidth, h = host.clientHeight;
+  if (!w || !h) return;
+  const padX = w / N / 2, padY = 22, usable = h - padY * 2;
+  const pts = BLUEPRINT.map((s, i) => ({
+    x: padX + (i * (w - padX * 2)) / (N - 1),
+    y: padY + (1 - s.emotion / 100) * usable,
+    s
+  }));
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+  svg.setAttribute("width", w); svg.setAttribute("height", h);
+  // smooth path
+  let d = "M " + pts[0].x + " " + pts[0].y;
+  for (let i = 1; i < pts.length; i++) {
+    const p0 = pts[i - 1], p1 = pts[i], mx = (p0.x + p1.x) / 2;
+    d += " C " + mx + " " + p0.y + ", " + mx + " " + p1.y + ", " + p1.x + " " + p1.y;
+  }
+  let inner = '<path class="emo-line" d="' + d + '" />';
+  pts.forEach(p => {
+    inner += '<circle class="emo-dot" cx="' + p.x + '" cy="' + p.y + '" r="6" />';
+    inner += '<text class="emo-label" x="' + p.x + '" y="' + (p.y > h / 2 ? p.y - 14 : p.y + 24) + '">' + p.s.feel + '</text>';
+  });
+  svg.innerHTML = inner;
+}
+window.addEventListener("resize", drawEmotion);
+window.addEventListener("load", drawEmotion);
+setTimeout(drawEmotion, 60);
+drawEmotion();
+</script>
+</body>
+</html>
