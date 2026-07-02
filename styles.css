@@ -226,6 +226,94 @@ table.data th { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppe
 table.data tr:last-child td { border-bottom: none; }
 .status-live { color: #2a6e3a; } .status-draft { color: #9a6a00; }
 
+/* ── Interactive flow chart (journey.html) ─────────────────
+   Left-to-right expandable tree. JS builds:
+     .tree-node > (.node-card [+ .node-toggle])  +  .tree-children (column of .tree-node)
+   and draws SVG bezier connectors parent-right → child-left over .flow-svg. */
+.flow-controls { display: flex; justify-content: center; gap: 10px; margin: 4px 0 20px; }
+.flow-btn {
+  font-family: inherit; font-size: 0.8rem; letter-spacing: 0.02em;
+  color: #6a5a4e; background: #fff; border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 7px 16px; cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.flow-btn:hover { border-color: var(--brown); color: var(--brown); background: var(--brown-bg); }
+
+.flow-scroll {
+  overflow: auto; -webkit-overflow-scrolling: touch;
+  background:
+    radial-gradient(circle at 1px 1px, #e7e0d8 1px, transparent 0) 0 0 / 22px 22px,
+    #fcfaf7;
+  border: 1.5px solid var(--border); border-radius: 16px;
+  padding: 28px 24px; max-height: 78vh;
+}
+.flow-inner { position: relative; display: inline-block; min-width: 100%; }
+.flow-svg { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
+.flow-svg path { fill: none; stroke: #cbbcae; stroke-width: 2; }
+
+/* the tree: each node is [card | its children column], laid left → right */
+.tree-node { display: flex; flex-direction: row; align-items: center; }
+.tree-children {
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 14px; margin-left: 46px;   /* horizontal gap = room for connectors */
+}
+
+.node-card {
+  position: relative; z-index: 1;
+  background: #fff; border: 1.5px solid var(--border);
+  border-left: 4px solid var(--brown);
+  border-radius: 12px; padding: 12px 40px 12px 16px;
+  min-width: 176px; max-width: 260px; margin: 5px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
+}
+.node-card:hover { box-shadow: 0 6px 20px rgba(140,111,94,0.16); transform: translateY(-1px); }
+.node-card .n-label { font-size: 0.9rem; font-weight: 600; color: #3a3a3a; letter-spacing: 0.01em; }
+.node-card .n-sub { font-size: 0.74rem; color: var(--muted); font-style: italic; margin-top: 2px; }
+.node-card .n-detail {
+  margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--border);
+  font-size: 0.76rem; color: #5a4a42; line-height: 1.45;
+}
+.node-card .n-detail > div { margin: 2px 0; }
+
+/* expand / collapse pill */
+.node-toggle {
+  position: absolute; top: 50%; right: -13px; transform: translateY(-50%);
+  z-index: 2; min-width: 26px; height: 26px; padding: 0 6px;
+  border-radius: 14px; border: 1.5px solid var(--border); background: #fff;
+  color: var(--brown); font-family: inherit; font-size: 0.95rem; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1); transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.node-toggle:hover { background: var(--brown); border-color: var(--brown); color: #fff; }
+.node-toggle .cnt { font-size: 0.66rem; margin-left: 2px; opacity: 0.85; }
+
+/* type colors — match the legend on journey.html */
+.node-card.type-root      { border-left-color: #3a3a3a; background: #fff; }
+.node-card.type-entry     { border-left-color: #3a7bc8; }
+.node-card.type-decision  { border-left-color: #7a4cc4; }
+.node-card.type-stage     { border-left-color: var(--brown); }
+.node-card.type-pipeline  { border-left-color: #b8863e; background: #fffdf7; }
+.node-card.type-milestone { border-left-color: #16a34a; background: #f6fcf7; }
+.node-card.type-urgent    { border-left-color: #dc2626; background: #fef8f8; }
+.node-card.type-ref {
+  border-style: dashed; border-left-style: solid; border-left-color: #b0a89f;
+  background: #faf8f5; cursor: pointer; color: #6a5a4e;
+}
+.node-card.type-ref:hover { border-color: var(--brown); border-left-color: var(--brown); background: var(--brown-bg); }
+.node-card.type-ref .n-label { font-weight: 600; color: var(--brown); font-size: 0.82rem; }
+
+.node-card.flash { animation: nodeFlash 1.2s ease; }
+@keyframes nodeFlash {
+  0%, 100% { box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  20%, 60% { box-shadow: 0 0 0 3px rgba(140,111,94,0.5), 0 6px 22px rgba(140,111,94,0.3); }
+}
+
+@media (max-width: 560px) {
+  .tree-children { margin-left: 30px; gap: 10px; }
+  .node-card { min-width: 150px; padding-right: 34px; }
+}
+
 /* ── Snapshot stamp / footer ─────────────────────── */
 .snapshot { text-align: center; font-size: 0.74rem; color: var(--muted); font-style: italic; margin: 26px 0 0; }
 footer { text-align: center; margin-top: 40px; font-size: 0.74rem; color: #bbb; font-style: italic; }

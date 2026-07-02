@@ -153,9 +153,13 @@ function jumpTo(id) {
   setTimeout(() => el.classList.remove("flash"), 1200);
 }
 
-function setAll(open) { Object.values(byId).forEach(n => { if (n.children && n.children.length) n._open = open; }); render(); }
+function scrollToRoot() {
+  const el = treeEl.querySelector('.node-card[data-id="root"]');
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "center", inline: "start" });
+}
+function setAll(open) { Object.values(byId).forEach(n => { if (n.children && n.children.length) n._open = open; }); render(); scrollToRoot(); }
 function expandAll()   { setAll(true); }
-function collapseAll() { Object.values(byId).forEach(n => n._open = (n._depth <= 1)); render(); }
+function collapseAll() { Object.values(byId).forEach(n => n._open = (n._depth <= 1)); render(); scrollToRoot(); }
 
 window.addEventListener("resize", drawConnectors);
 window.addEventListener("load", drawConnectors);
