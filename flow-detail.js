@@ -127,5 +127,33 @@ window.FLOW_DETAIL = {
   ],
   "care-gaps": [
     { type: "behind", title: "No one slips away", body: "Active Care Gaps tracks days since the last appointment (1–7d … 1yr+) and prompts re-engagement so active clients don't quietly lapse." }
+  ],
+
+  "matching-tool": [
+    { type: "tool", title: "How it works", body: "A prospective client answers a few questions — type of care, then their needs in their own words — and gets the best 1–3 clinicians, ranked, with the reason each fits. It never shows an empty screen: if no one's open, it offers a 'welcoming clients soon' tier." },
+    { type: "behind", title: "Behind the scenes", body: "Same scoring engine as the CCC Console. Reads live availability from GHL and collects ZERO PHI — identifying info only appears at the hand-off form." }
+  ],
+  "mt-medication": [
+    { type: "note", title: "All prescribers shown", body: "When 'Medication' is picked, every available prescriber is listed (not just the top 3): Dr. Adrian Kress (MD psychiatrist) and Dr. Brent Donmoyer (PMHNP)." }
+  ],
+  "mt-testing": [
+    { type: "script", title: "What the client sees", body: "A shared Testing Team card appears first — always available, even when the psychologists are full — with the ~20-hour process and the $4,320 package. 'Reach out to our team' sets up the discovery call." }
+  ],
+  "mt-book": [
+    { type: "script", title: "The disclaimer (shown first)", body: "“Before you reach out — Kentlands is out-of-network. Most clients pay out of pocket and use a monthly superbill for reimbursement.” Then the client chooses their path." },
+    { type: "note", title: "Three message paths — tagged differently", body: "Whatever they pick tags the inquiry: “Clinician Matching — <clinician>” (booking), “— In-network referral request”, or “— Insurance question”, so the team knows exactly what it is." }
+  ],
+  "mt-oop": [
+    { type: "textback", title: "The pre-written message", body: "“We've already written your message — just review and send.” Goes by text (SMS to the practice) or a prefilled HIPAA form — carrying the care type, specialties, and the client's summary. Reassures: 'no payment or commitment here.'" },
+    { type: "note", title: "Superbill", body: "Client is reminded a superbill is provided for out-of-network reimbursement." }
+  ],
+  "mt-innet": [
+    { type: "script", title: "In-network path", body: "Choosing 'stay in-network' flips the module to a 'we'll help you find someone in-network' view; the message becomes an in-network referral request — a warm signal/lead for the team to work." }
+  ],
+  "ccc-console": [
+    { type: "tool", title: "Coordinator co-pilot", body: "Guides the coordinator through the call with word-for-word scripts, captures the details, and recommends clinicians live using the same matcher. Caller name/contact go only into the secure GHL form." }
+  ],
+  "clinician-console": [
+    { type: "tool", title: "Clinician self-service", body: "Clinicians sign in (email + last-4 of phone) and flip OPEN/FULL or edit their bio/age range. Availability writes straight to their GHL record and the matcher picks it up — so the public tool is always current." }
   ]
 };

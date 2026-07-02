@@ -89,7 +89,52 @@ window.JOURNEY = {
           ]
         },
         { id: "webforms", label: "Web forms", sub: "Website & webforms", type: "entry", detail: ["Main Website Contact form", "All Inquiries webform", "Website Testing Inquiry form", "Cancellation Request"], children: [ { id: "ref-web", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
-        { id: "tools", label: "Our tools", sub: "The 3 KP tools", type: "entry", detail: ["Clinician Matching Tool (public search)", "CCC Console (coordinator call co-pilot)", "Clinician Console (self-service)"], children: [ { id: "ref-tools", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] }
+        {
+          id: "tools", label: "Our tools", sub: "The 3 KP tools", type: "entry",
+          detail: ["Custom software LIAH built on top of GHL"],
+          children: [
+            {
+              id: "matching-tool", label: "Clinician Matching Tool", sub: "Public self-serve search", type: "decision",
+              detail: ["3-step wizard: type of care → your needs → matched clinicians", "Always returns the best 1–3 — never a dead end"],
+              children: [
+                {
+                  id: "mt-care", label: "Pick type of care", sub: "Step 1 — routes everything", type: "decision",
+                  children: [
+                    { id: "mt-therapy", label: "Therapy", sub: "individual · minor · couples · family", type: "stage",
+                      detail: ["Ranked by specialty, population, age, location, PSYPACT", "Also reads your own words against each bio for fit"],
+                      children: [ { id: "ref-mt-therapy", label: "→ Connect / book", type: "ref", to: "mt-book" } ] },
+                    { id: "mt-medication", label: "Medication", sub: "psychiatry", type: "stage",
+                      detail: ["Shows every available prescriber (Dr. Kress, Dr. Donmoyer)"],
+                      children: [ { id: "ref-mt-med", label: "→ Connect / book", type: "ref", to: "mt-book" } ] },
+                    { id: "mt-testing", label: "Testing & assessment", sub: "$4,320 program", type: "stage",
+                      detail: ["Shared Testing Team card — always shown, even when full", "Reach out → coordinator sets up the discovery call"],
+                      children: [ { id: "ref-mt-test", label: "→ Connect / book", type: "ref", to: "mt-book" } ] }
+                  ]
+                },
+                {
+                  id: "mt-book", label: "Connect with the clinician", sub: "the insurance fork", type: "decision",
+                  detail: ["Out-of-network disclaimer first: KP is private, fee-for-service"],
+                  children: [
+                    { id: "mt-oop", label: "Comfortable paying out of pocket", type: "milestone",
+                      detail: ["Prefilled text or HIPAA form (no PHI on our side)", "Superbill provided for out-of-network reimbursement"],
+                      children: [ { id: "ref-mt-oop", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
+                    { id: "mt-innet", label: "Prefer to stay in-network", type: "stage",
+                      detail: ["Shifts to an in-network referral request — the team helps find someone"],
+                      children: [ { id: "ref-mt-innet", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
+                    { id: "mt-insq", label: "Insurance question", type: "stage",
+                      children: [ { id: "ref-mt-insq", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] }
+                  ]
+                }
+              ]
+            },
+            { id: "ccc-console", label: "CCC Console", sub: "Coordinator call co-pilot", type: "stage",
+              detail: ["Guides the coordinator through the call live", "Reuses the SAME matcher engine on the call", "Writes the call note straight into GHL"],
+              children: [ { id: "ref-ccc", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
+            { id: "clinician-console", label: "Clinician Console", sub: "Clinician self-service", type: "stage",
+              detail: ["Clinicians set OPEN / FULL + edit their profile", "Availability feeds the matcher in real time"],
+              children: [ { id: "ref-clincon", label: "→ Feeds the matcher", type: "ref", to: "matching-tool" } ] }
+          ]
+        }
       ]
     },
 
