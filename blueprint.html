@@ -21,106 +21,226 @@
 <div class="wrap">
   <header class="hero">
     <h1>The Journey Blueprint</h1>
-    <p class="lede">The same journey seen as a service blueprint — what the client <em>does and feels</em> above the line, and what the system quietly does <em>below</em> it. Hover a stage to focus it.</p>
+    <p class="lede">Walk in a client's shoes — what they <em>do and feel</em> at each step, and what the system quietly does behind the scenes to carry them through.</p>
   </header>
 
-  <div class="bp-legend">
-    <span><span class="bp-key front"></span> Frontstage — what the client experiences</span>
-    <span><span class="bp-key back"></span> Backstage — what GHL &amp; the team do, unseen</span>
+  <!-- mode toggle -->
+  <div class="mode-toggle" role="tablist">
+    <button class="mode-btn active" id="mode-walk" onclick="setMode('walk')">▸ Walk the journey</button>
+    <button class="mode-btn" id="mode-grid" onclick="setMode('grid')">▦ See it all</button>
   </div>
 
-  <div class="bp-scroll" id="bp-scroll">
-    <div class="bp-grid" id="bp-grid"><!-- built by JS --></div>
-  </div>
+  <!-- ══════════ WALKTHROUGH VIEW ══════════ -->
+  <section id="view-walk">
+    <!-- clickable stepper -->
+    <div class="stepper" id="stepper"></div>
+
+    <!-- interactive emotion curve -->
+    <div class="emo-hero">
+      <div class="emo-hero-label">How it feels along the way</div>
+      <div class="emo-hero-svg" id="emo-hero"><svg id="emo-hero-svg"></svg></div>
+    </div>
+
+    <!-- spotlight card -->
+    <div class="wt-card" id="wt-card"></div>
+
+    <!-- controls -->
+    <div class="wt-controls">
+      <button class="flow-btn" id="wt-prev" onclick="prev()">← Back</button>
+      <button class="flow-btn wt-auto" id="wt-auto" onclick="toggleAuto()">▶ Autoplay</button>
+      <button class="flow-btn wt-next" id="wt-next" onclick="next()">Next →</button>
+    </div>
+    <p class="wt-hint">Use ← → arrow keys, click a step above, or press Autoplay</p>
+  </section>
+
+  <!-- ══════════ GRID (SEE IT ALL) VIEW ══════════ -->
+  <section id="view-grid" hidden>
+    <div class="bp-legend">
+      <span><span class="bp-key front"></span> Frontstage — what the client experiences</span>
+      <span><span class="bp-key back"></span> Backstage — what GHL &amp; the team do, unseen</span>
+    </div>
+    <div class="bp-scroll" id="bp-scroll"><div class="bp-grid" id="bp-grid"></div></div>
+  </section>
 
   <footer>The dip at First Contact &amp; Paperwork is where clients are most likely to drop — that's where the automations work hardest · edit <code>blueprint-data.js</code> to change this map</footer>
 </div>
 
 <script src="blueprint-data.js"></script>
 <script>
-const grid = document.getElementById("bp-grid");
-const scroller = document.getElementById("bp-scroll");
-const N = BLUEPRINT.length;
+const D = window.BLUEPRINT, N = D.length;
+let cur = 0, mode = "walk", autoTimer = null;
+const SVGNS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
 
-// column template: sticky label column + one column per stage
-grid.style.gridTemplateColumns = "var(--lane-w) repeat(" + N + ", minmax(190px, 1fr))";
+// sentiment → color band
+function sent(v) { return v < 45 ? "#c47a3a" : v < 63 ? "#8c6f5e" : "#3a8c4a"; }
 
-function cell(cls, html) { return '<div class="bp-cell ' + cls + '">' + html + '</div>'; }
-function lane(label, sub) { return '<div class="bp-lane-label"><span class="ll-title">' + label + '</span>' + (sub ? '<span class="ll-sub">' + sub + '</span>' : '') + '</div>'; }
-function list(items) { return '<ul class="bp-list">' + items.map(i => '<li>' + i + '</li>').join('') + '</ul>'; }
+/* ── stepper ─────────────────────────────── */
+function renderStepper() {
+  $("stepper").innerHTML = D.map((s, i) =>
+    '<button class="step' + (i === cur ? ' active' : '') + (i < cur ? ' done' : '') + '" ' +
+    'onclick="goTo(' + i + ')" title="' + s.name + '">' +
+    '<span class="step-ic">' + s.icon + '</span>' +
+    '<span class="step-nm">' + s.name + '</span></button>' +
+    (i < N - 1 ? '<span class="step-line' + (i < cur ? ' done' : '') + '"></span>' : '')
+  ).join("");
+}
 
-let html = "";
+/* ── spotlight card ──────────────────────── */
+function renderSpotlight() {
+  const s = D[cur], c = sent(s.emotion);
+  const list = a => '<ul class="wt-list">' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+  const tags = a => '<div class="bp-tags">' + a.map(t => '<span class="bp-tag">' + t + '</span>').join('') + '</div>';
+  $("wt-card").style.setProperty("--accent", c);
+  $("wt-card").innerHTML =
+    '<div class="wt-head">' +
+      '<span class="wt-icon" style="background:' + c + '22;border-color:' + c + '">' + s.icon + '</span>' +
+      '<div class="wt-head-txt"><div class="wt-stage">' + s.name + '</div>' +
+        '<div class="wt-count">Step ' + (cur + 1) + ' of ' + N + '</div></div>' +
+      '<span class="wt-emoji" title="' + s.feel + '">' + s.emoji + '</span>' +
+    '</div>' +
+    '<div class="wt-feel" style="color:' + c + '">"' + s.feel + '"</div>' +
+    '<div class="wt-story">' + s.story + '</div>' +
+    '<div class="wt-cols">' +
+      '<div class="wt-col front">' +
+        '<h4>🙋 Frontstage · what they experience</h4>' +
+        '<div class="wt-sub">They do</div>' + list(s.client) +
+        '<div class="wt-sub">Touchpoints</div>' + tags(s.touch) +
+      '</div>' +
+      '<div class="wt-visline"><span>line of visibility</span></div>' +
+      '<div class="wt-col back">' +
+        '<h4>⚙️ Backstage · what the system does</h4>' +
+        '<div class="wt-sub">GHL &amp; team</div>' + list(s.backstage) +
+        '<div class="wt-sub">KP tool at work</div>' +
+        (s.tool ? '<span class="bp-tool">' + s.tool + '</span>' : '<span class="bp-none">—</span>') +
+      '</div>' +
+    '</div>';
+  // re-trigger entrance animation
+  const card = $("wt-card"); card.classList.remove("enter"); void card.offsetWidth; card.classList.add("enter");
+  // buttons
+  $("wt-prev").disabled = cur === 0;
+  $("wt-next").disabled = cur === N - 1;
+}
 
-// ── Row 1: stage headers ───────────────────────────────
-html += '<div class="bp-lane-label bp-corner">Stage</div>';
-BLUEPRINT.forEach((s, i) => {
-  html += '<div class="bp-cell bp-head" data-col="' + i + '"><span class="bp-ic">' + s.icon + '</span><span class="bp-stage-name">' + s.name + '</span></div>';
-});
-
-// ── Row 2: client actions ──────────────────────────────
-html += lane("What the client does", "frontstage");
-BLUEPRINT.forEach((s, i) => html += '<div class="bp-cell front" data-col="' + i + '">' + list(s.client) + '</div>');
-
-// ── Row 3: touchpoints ─────────────────────────────────
-html += lane("Touchpoints", "channels");
-BLUEPRINT.forEach((s, i) => html += '<div class="bp-cell front" data-col="' + i + '"><div class="bp-tags">' + s.touch.map(t => '<span class="bp-tag">' + t + '</span>').join('') + '</div></div>');
-
-// ── Row 4: emotion curve (single spanning cell w/ svg) ─
-html += lane("How it feels", "emotion");
-html += '<div class="bp-emotion" id="bp-emotion" style="grid-column: 2 / -1;"><svg id="bp-emo-svg"></svg></div>';
-
-// ── line of visibility ─────────────────────────────────
-html += '<div class="bp-visibility" style="grid-column: 1 / -1;"><span>— line of visibility —</span></div>';
-
-// ── Row 5: backstage (GHL) ─────────────────────────────
-html += lane("Behind the scenes", "GHL + team");
-BLUEPRINT.forEach((s, i) => html += '<div class="bp-cell back" data-col="' + i + '">' + list(s.backstage) + '</div>');
-
-// ── Row 6: active KP tool ──────────────────────────────
-html += lane("KP tool at work", "our software");
-BLUEPRINT.forEach((s, i) => html += '<div class="bp-cell back" data-col="' + i + '">' + (s.tool ? '<span class="bp-tool">' + s.tool + '</span>' : '<span class="bp-none">—</span>') + '</div>');
-
-grid.innerHTML = html;
-
-// ── column focus on hover ──────────────────────────────
-grid.addEventListener("mouseover", e => {
-  const c = e.target.closest("[data-col]"); if (!c) return;
-  const col = c.dataset.col;
-  grid.querySelectorAll("[data-col]").forEach(el => el.classList.toggle("col-focus", el.dataset.col === col));
-});
-grid.addEventListener("mouseleave", () => grid.querySelectorAll(".col-focus").forEach(el => el.classList.remove("col-focus")));
-
-// ── draw the emotion curve ─────────────────────────────
-function drawEmotion() {
-  const host = document.getElementById("bp-emotion");
-  const svg = document.getElementById("bp-emo-svg");
+/* ── interactive hero emotion curve ──────── */
+function drawHeroCurve(animate) {
+  const host = $("emo-hero"), svg = $("emo-hero-svg");
   const w = host.clientWidth, h = host.clientHeight;
   if (!w || !h) return;
-  const padX = w / N / 2, padY = 22, usable = h - padY * 2;
-  const pts = BLUEPRINT.map((s, i) => ({
+  const padX = Math.max(30, w / N / 2), padY = 26, usable = h - padY * 2;
+  const pts = D.map((s, i) => ({
     x: padX + (i * (w - padX * 2)) / (N - 1),
-    y: padY + (1 - s.emotion / 100) * usable,
-    s
+    y: padY + (1 - s.emotion / 100) * usable, s, i
   }));
+  let line = "M " + pts[0].x + " " + pts[0].y;
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1], b = pts[i], mx = (a.x + b.x) / 2;
+    line += " C " + mx + " " + a.y + ", " + mx + " " + b.y + ", " + b.x + " " + b.y;
+  }
+  const area = line + " L " + pts[N - 1].x + " " + h + " L " + pts[0].x + " " + h + " Z";
+  let inner =
+    '<defs><linearGradient id="emoFill" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#8c6f5e" stop-opacity="0.20"/>' +
+      '<stop offset="1" stop-color="#8c6f5e" stop-opacity="0"/></linearGradient></defs>' +
+    '<path d="' + area + '" fill="url(#emoFill)" stroke="none"/>' +
+    '<path id="emo-path" d="' + line + '" fill="none" stroke="#c9b8ae" stroke-width="3"/>';
+  pts.forEach(p => {
+    const on = p.i === cur;
+    inner += '<line x1="' + p.x + '" y1="' + (p.y + 8) + '" x2="' + p.x + '" y2="' + (h - 16) + '" stroke="' + (on ? sent(p.s.emotion) : "#e6ddd3") + '" stroke-width="' + (on ? 2 : 1) + '" stroke-dasharray="' + (on ? "0" : "3 3") + '"/>';
+  });
+  pts.forEach(p => {
+    const on = p.i === cur, col = sent(p.s.emotion);
+    inner += '<circle class="emo-pt" data-i="' + p.i + '" cx="' + p.x + '" cy="' + p.y + '" r="' + (on ? 10 : 6) + '" fill="' + (on ? col : "#fff") + '" stroke="' + col + '" stroke-width="3" style="cursor:pointer"/>';
+    inner += '<text class="emo-ic" x="' + p.x + '" y="' + (h - 4) + '" text-anchor="middle">' + p.s.icon + '</text>';
+    if (on) inner += '<text class="emo-now" x="' + p.x + '" y="' + (p.y - 18) + '" text-anchor="middle">' + p.s.emoji + '</text>';
+  });
   svg.setAttribute("viewBox", "0 0 " + w + " " + h);
   svg.setAttribute("width", w); svg.setAttribute("height", h);
-  // smooth path
-  let d = "M " + pts[0].x + " " + pts[0].y;
-  for (let i = 1; i < pts.length; i++) {
-    const p0 = pts[i - 1], p1 = pts[i], mx = (p0.x + p1.x) / 2;
-    d += " C " + mx + " " + p0.y + ", " + mx + " " + p1.y + ", " + p1.x + " " + p1.y;
-  }
-  let inner = '<path class="emo-line" d="' + d + '" />';
-  pts.forEach(p => {
-    inner += '<circle class="emo-dot" cx="' + p.x + '" cy="' + p.y + '" r="6" />';
-    inner += '<text class="emo-label" x="' + p.x + '" y="' + (p.y > h / 2 ? p.y - 14 : p.y + 24) + '">' + p.s.feel + '</text>';
-  });
   svg.innerHTML = inner;
+  svg.querySelectorAll(".emo-pt").forEach(c => c.addEventListener("click", () => goTo(+c.dataset.i)));
+  if (animate) {
+    const path = $("emo-path"), len = path.getTotalLength();
+    path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+    path.style.transition = "stroke-dashoffset 1.1s ease";
+    setTimeout(() => { path.style.strokeDashoffset = "0"; }, 30);
+  }
 }
-window.addEventListener("resize", drawEmotion);
-window.addEventListener("load", drawEmotion);
-setTimeout(drawEmotion, 60);
-drawEmotion();
+
+/* ── navigation ──────────────────────────── */
+function renderWalk(animateCurve) { renderStepper(); renderSpotlight(); drawHeroCurve(animateCurve); }
+function goTo(i) { stopAuto(); cur = Math.max(0, Math.min(N - 1, i)); renderWalk(false); }
+function next() { if (cur < N - 1) { cur++; renderWalk(false); } else stopAuto(); }
+function prev() { if (cur > 0) { cur--; renderWalk(false); } }
+
+function toggleAuto() {
+  if (autoTimer) { stopAuto(); return; }
+  if (cur >= N - 1) cur = 0;
+  $("wt-auto").innerHTML = "⏸ Pause"; $("wt-auto").classList.add("playing");
+  renderWalk(false);
+  autoTimer = setInterval(() => { if (cur >= N - 1) stopAuto(); else { cur++; renderWalk(false); } }, 2800);
+}
+function stopAuto() {
+  if (!autoTimer) return;
+  clearInterval(autoTimer); autoTimer = null;
+  const b = $("wt-auto"); if (b) { b.innerHTML = "▶ Autoplay"; b.classList.remove("playing"); }
+}
+
+document.addEventListener("keydown", e => {
+  if (mode !== "walk") return;
+  if (e.key === "ArrowRight") { e.preventDefault(); next(); }
+  if (e.key === "ArrowLeft")  { e.preventDefault(); prev(); }
+});
+
+/* ── mode toggle ─────────────────────────── */
+function setMode(m) {
+  mode = m; stopAuto();
+  $("mode-walk").classList.toggle("active", m === "walk");
+  $("mode-grid").classList.toggle("active", m === "grid");
+  $("view-walk").hidden = m !== "walk";
+  $("view-grid").hidden = m !== "grid";
+  if (m === "walk") { renderWalk(true); }
+  else { if (!$("bp-grid").dataset.built) buildGrid(); setTimeout(drawGridEmotion, 40); }
+}
+
+/* ── grid ("see it all") ─────────────────── */
+function buildGrid() {
+  const grid = $("bp-grid");
+  grid.style.gridTemplateColumns = "var(--lane-w) repeat(" + N + ", minmax(190px, 1fr))";
+  const lane = (l, s) => '<div class="bp-lane-label"><span class="ll-title">' + l + '</span>' + (s ? '<span class="ll-sub">' + s + '</span>' : '') + '</div>';
+  const list = a => '<ul class="bp-list">' + a.map(i => '<li>' + i + '</li>').join('') + '</ul>';
+  let html = '<div class="bp-lane-label bp-corner">Stage</div>';
+  D.forEach((s, i) => html += '<div class="bp-cell bp-head" data-col="' + i + '"><span class="bp-ic">' + s.icon + '</span><span class="bp-stage-name">' + s.name + '</span></div>');
+  html += lane("What the client does", "frontstage");
+  D.forEach((s, i) => html += '<div class="bp-cell front" data-col="' + i + '">' + list(s.client) + '</div>');
+  html += lane("Touchpoints", "channels");
+  D.forEach((s, i) => html += '<div class="bp-cell front" data-col="' + i + '"><div class="bp-tags">' + s.touch.map(t => '<span class="bp-tag">' + t + '</span>').join('') + '</div></div>');
+  html += lane("How it feels", "emotion");
+  html += '<div class="bp-emotion" id="bp-emotion" style="grid-column: 2 / -1;"><svg id="bp-emo-svg"></svg></div>';
+  html += '<div class="bp-visibility" style="grid-column: 1 / -1;"><span>— line of visibility —</span></div>';
+  html += lane("Behind the scenes", "GHL + team");
+  D.forEach((s, i) => html += '<div class="bp-cell back" data-col="' + i + '">' + list(s.backstage) + '</div>');
+  html += lane("KP tool at work", "our software");
+  D.forEach((s, i) => html += '<div class="bp-cell back" data-col="' + i + '">' + (s.tool ? '<span class="bp-tool">' + s.tool + '</span>' : '<span class="bp-none">—</span>') + '</div>');
+  grid.innerHTML = html; grid.dataset.built = "1";
+  grid.addEventListener("mouseover", e => { const c = e.target.closest("[data-col]"); if (!c) return; grid.querySelectorAll("[data-col]").forEach(el => el.classList.toggle("col-focus", el.dataset.col === c.dataset.col)); });
+  grid.addEventListener("mouseleave", () => grid.querySelectorAll(".col-focus").forEach(el => el.classList.remove("col-focus")));
+}
+function drawGridEmotion() {
+  const host = $("bp-emotion"), svg = $("bp-emo-svg"); if (!host || !svg) return;
+  const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
+  const padX = w / N / 2, padY = 22, usable = h - padY * 2;
+  const pts = D.map((s, i) => ({ x: padX + (i * (w - padX * 2)) / (N - 1), y: padY + (1 - s.emotion / 100) * usable, s }));
+  let d = "M " + pts[0].x + " " + pts[0].y;
+  for (let i = 1; i < pts.length; i++) { const a = pts[i - 1], b = pts[i], mx = (a.x + b.x) / 2; d += " C " + mx + " " + a.y + ", " + mx + " " + b.y + ", " + b.x + " " + b.y; }
+  let inner = '<path class="emo-line" d="' + d + '"/>';
+  pts.forEach(p => { inner += '<circle class="emo-dot" cx="' + p.x + '" cy="' + p.y + '" r="6"/>'; inner += '<text class="emo-label" x="' + p.x + '" y="' + (p.y > h / 2 ? p.y - 14 : p.y + 24) + '">' + p.s.feel + '</text>'; });
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h); svg.setAttribute("width", w); svg.setAttribute("height", h); svg.innerHTML = inner;
+}
+
+window.addEventListener("resize", () => { if (mode === "walk") drawHeroCurve(false); else drawGridEmotion(); });
+window.addEventListener("load", () => { if (mode === "walk") drawHeroCurve(true); });
+setMode("walk");
+setTimeout(() => drawHeroCurve(true), 80);
 </script>
 </body>
 </html>
