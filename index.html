@@ -6,323 +6,193 @@
   <title>Client Journey — Kentlands Psychotherapy</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Georgia', serif;
-      background: #faf8f5;
-      color: #2c2c2c;
-      min-height: 100vh;
-      padding: 48px 24px;
+    :root {
+      --brown: #8c6f5e; --brown-light: #b8937e; --brown-bg: #fff9f6;
+      --border: #e0dbd4; --text: #2c2c2c; --muted: #888; --bg: #faf8f5;
     }
-
-    header {
-      text-align: center;
-      margin-bottom: 56px;
-    }
-
-    header h1 {
-      font-size: 2rem;
-      font-weight: normal;
-      letter-spacing: 0.04em;
-      color: #3a3a3a;
-    }
-
-    header p {
-      margin-top: 10px;
-      font-size: 1rem;
-      color: #888;
-      font-style: italic;
-    }
-
-    .journey {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
-      max-width: 680px;
-      margin: 0 auto;
-    }
-
-    .stage {
-      width: 100%;
-      opacity: 0;
-      transform: translateY(24px);
-      animation: fadeUp 0.5s ease forwards;
-    }
-
-    .stage:nth-child(1)  { animation-delay: 0.1s; }
-    .stage:nth-child(3)  { animation-delay: 0.3s; }
-    .stage:nth-child(5)  { animation-delay: 0.5s; }
-    .stage:nth-child(7)  { animation-delay: 0.7s; }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .stage-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: #fff;
-      border: 1.5px solid #e0dbd4;
-      border-radius: 12px;
-      padding: 18px 22px;
-      cursor: pointer;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      user-select: none;
-    }
-
-    .stage-header:hover {
-      border-color: #b8a99a;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-    }
-
-    .stage.active .stage-header {
-      border-color: #8c6f5e;
-      background: #fff9f6;
-      box-shadow: 0 4px 20px rgba(140,111,94,0.12);
-    }
-
-    .stage-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      flex-shrink: 0;
-    }
-
+    body { font-family: 'Georgia', serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 48px 24px 80px; }
+    header { text-align: center; margin-bottom: 20px; }
+    header h1 { font-size: 2rem; font-weight: normal; letter-spacing: 0.04em; color: #3a3a3a; }
+    header p { margin-top: 8px; font-size: 0.95rem; color: var(--muted); font-style: italic; }
+    .phase-label { text-align: center; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 28px 0 10px; opacity: 0; animation: fadeUp 0.4s ease forwards; }
+    .journey { display: flex; flex-direction: column; align-items: center; max-width: 720px; margin: 0 auto; }
+    .stage { width: 100%; opacity: 0; transform: translateY(20px); animation: fadeUp 0.45s ease forwards; }
+    .stage-header { display: flex; align-items: center; gap: 14px; background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 16px 20px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; user-select: none; }
+    .stage-header:hover { border-color: #b8a99a; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .stage.active .stage-header { border-color: var(--brown); background: var(--brown-bg); box-shadow: 0 4px 20px rgba(140,111,94,0.12); }
+    .stage-icon { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
     .stage-label { flex: 1; }
-
-    .stage-label h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      color: #3a3a3a;
-    }
-
-    .stage-label p {
-      font-size: 0.82rem;
-      color: #999;
-      margin-top: 2px;
-      font-style: italic;
-    }
-
-    .chevron {
-      font-size: 0.8rem;
-      color: #aaa;
-      transition: transform 0.3s;
-    }
-
-    .stage.active .chevron {
-      transform: rotate(180deg);
-      color: #8c6f5e;
-    }
-
-    .stage-detail {
-      overflow: hidden;
-      max-height: 0;
-      transition: max-height 0.4s ease;
-    }
-
-    .stage.active .stage-detail {
-      max-height: 400px;
-    }
-
-    .stage-detail-inner {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 16px 22px 20px;
-      background: #fff9f6;
-      border: 1.5px solid #e0dbd4;
-      border-top: none;
-      border-radius: 0 0 12px 12px;
-    }
-
-    .tag {
-      background: #f2ede8;
-      border: 1px solid #d8cec6;
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 0.85rem;
-      color: #5a4a42;
-      animation: tagPop 0.25s ease forwards;
-      opacity: 0;
-      transform: scale(0.9);
-    }
-
-    .tag:nth-child(1) { animation-delay: 0.05s; }
-    .tag:nth-child(2) { animation-delay: 0.10s; }
-    .tag:nth-child(3) { animation-delay: 0.15s; }
-    .tag:nth-child(4) { animation-delay: 0.20s; }
-    .tag:nth-child(5) { animation-delay: 0.25s; }
-
-    @keyframes tagPop {
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .connector {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 44px;
-      opacity: 0;
-      animation: fadeUp 0.4s ease forwards;
-    }
-
-    .connector:nth-child(2)  { animation-delay: 0.2s; }
-    .connector:nth-child(4)  { animation-delay: 0.4s; }
-    .connector:nth-child(6)  { animation-delay: 0.6s; }
-    .connector:nth-child(8)  { animation-delay: 0.8s; }
-
-    .connector-line {
-      width: 2px;
-      flex: 1;
-      background: linear-gradient(to bottom, #c9b8ae, #8c6f5e);
-    }
-
-    .connector-arrow {
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 8px solid #8c6f5e;
-    }
-
-    .final-badge {
-      margin-top: 8px;
-      text-align: center;
-      opacity: 0;
-      animation: fadeUp 0.5s ease 1.1s forwards;
-    }
-
-    .final-badge .badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #8c6f5e, #b8937e);
-      color: #fff;
-      padding: 14px 36px;
-      border-radius: 50px;
-      font-size: 1rem;
-      letter-spacing: 0.06em;
-      box-shadow: 0 6px 24px rgba(140,111,94,0.28);
-      animation: pulse 2.5s ease-in-out 1.6s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 6px 24px rgba(140,111,94,0.28); }
-      50% { box-shadow: 0 6px 32px rgba(140,111,94,0.5); }
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 56px;
-      font-size: 0.78rem;
-      color: #bbb;
-      font-style: italic;
-    }
+    .stage-label h2 { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; color: #3a3a3a; }
+    .stage-label p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; font-style: italic; }
+    .chevron { font-size: 0.75rem; color: #aaa; transition: transform 0.3s; }
+    .stage.active .chevron { transform: rotate(180deg); color: var(--brown); }
+    .stage-detail { overflow: hidden; max-height: 0; transition: max-height 0.4s ease; }
+    .stage.active .stage-detail { max-height: 600px; }
+    .stage-detail-inner { padding: 14px 20px 18px; background: var(--brown-bg); border: 1.5px solid var(--border); border-top: none; border-radius: 0 0 12px 12px; }
+    .detail-section { margin-bottom: 12px; }
+    .detail-section:last-child { margin-bottom: 0; }
+    .detail-section h3 { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brown); margin-bottom: 7px; font-weight: 600; }
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; }
+    .tag { background: #f2ede8; border: 1px solid #d8cec6; border-radius: 20px; padding: 5px 12px; font-size: 0.8rem; color: #5a4a42; opacity: 0; transform: scale(0.92); animation: tagPop 0.2s ease forwards; }
+    .tag.auto { background: #eef6ff; border-color: #c3daf5; color: #2a5a8c; }
+    .tag.urgent { background: #fff0f0; border-color: #f5c3c3; color: #8c2a2a; }
+    .tag.green { background: #f0faf0; border-color: #b8dfc0; color: #2a6e3a; }
+    .tag:nth-child(1){animation-delay:.03s} .tag:nth-child(2){animation-delay:.06s} .tag:nth-child(3){animation-delay:.09s} .tag:nth-child(4){animation-delay:.12s} .tag:nth-child(5){animation-delay:.15s} .tag:nth-child(6){animation-delay:.18s} .tag:nth-child(7){animation-delay:.21s}
+    @keyframes tagPop { to { opacity:1; transform:scale(1); } }
+    .connector { display: flex; flex-direction: column; align-items: center; height: 36px; opacity: 0; animation: fadeUp 0.3s ease forwards; }
+    .connector-line { width: 2px; flex: 1; background: linear-gradient(to bottom, #c9b8ae, var(--brown)); }
+    .connector-arrow { width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:7px solid var(--brown); }
+    .final-badge { margin-top: 10px; text-align: center; opacity: 0; animation: fadeUp 0.5s ease 2s forwards; }
+    .final-badge .badge { display: inline-block; background: linear-gradient(135deg, var(--brown), var(--brown-light)); color: #fff; padding: 14px 40px; border-radius: 50px; font-size: 1rem; letter-spacing: 0.06em; box-shadow: 0 6px 24px rgba(140,111,94,0.28); animation: pulse 2.5s ease-in-out 2.5s infinite; }
+    @keyframes pulse { 0%,100%{box-shadow:0 6px 24px rgba(140,111,94,0.28);}  50%{box-shadow:0 6px 32px rgba(140,111,94,0.5);} }
+    @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+    .stage:nth-child(1){animation-delay:.1s} .connector:nth-child(2){animation-delay:.2s} .stage:nth-child(3){animation-delay:.3s} .connector:nth-child(4){animation-delay:.4s} .stage:nth-child(5){animation-delay:.5s} .connector:nth-child(6){animation-delay:.6s} .stage:nth-child(7){animation-delay:.7s} .connector:nth-child(8){animation-delay:.8s} .stage:nth-child(9){animation-delay:.9s} .connector:nth-child(10){animation-delay:1s} .stage:nth-child(11){animation-delay:1.1s} .connector:nth-child(12){animation-delay:1.2s} .stage:nth-child(13){animation-delay:1.3s} .connector:nth-child(14){animation-delay:1.4s} .stage:nth-child(15){animation-delay:1.5s} .connector:nth-child(16){animation-delay:1.6s} .stage:nth-child(17){animation-delay:1.7s}
+    footer { text-align: center; margin-top: 48px; font-size: 0.75rem; color: #ccc; font-style: italic; }
+    .legend { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 16px 0 32px; font-size: 0.75rem; color: var(--muted); }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
   </style>
 </head>
 <body>
-
 <header>
   <h1>Client Journey</h1>
-  <p>Kentlands Psychotherapy — how someone becomes a client</p>
+  <p>Kentlands Psychotherapy — from first inquiry to active care</p>
 </header>
-
-<div class="journey">
-
-  <div class="stage" onclick="toggle(this)">
-    <div class="stage-header">
-      <div class="stage-icon" style="background:#fef3ec; color:#c47a3a;">🔍</div>
-      <div class="stage-label">
-        <h2>Discovery</h2>
-        <p>How people find us</p>
-      </div>
-      <span class="chevron">▼</span>
-    </div>
-    <div class="stage-detail">
-      <div class="stage-detail-inner">
-        <span class="tag">Google</span>
-        <span class="tag">Referrals</span>
-        <span class="tag">Advertisements</span>
-        <span class="tag">Socials</span>
-        <span class="tag">In-person Events</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-  <div class="stage" onclick="toggle(this)">
-    <div class="stage-header">
-      <div class="stage-icon" style="background:#eef6ff; color:#3a7bc8;">📞</div>
-      <div class="stage-label">
-        <h2>First Contact</h2>
-        <p>Reaching out to us</p>
-      </div>
-      <span class="chevron">▼</span>
-    </div>
-    <div class="stage-detail">
-      <div class="stage-detail-inner">
-        <span class="tag">Website</span>
-        <span class="tag">Call</span>
-        <span class="tag">Form</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-  <div class="stage" onclick="toggle(this)">
-    <div class="stage-header">
-      <div class="stage-icon" style="background:#f0faf0; color:#3a8c4a;">📋</div>
-      <div class="stage-label">
-        <h2>Insurance &amp; Fit</h2>
-        <p>Figuring out coverage &amp; match</p>
-      </div>
-      <span class="chevron">▼</span>
-    </div>
-    <div class="stage-detail">
-      <div class="stage-detail-inner">
-        <span class="tag">Understand Insurance &amp; Pricing</span>
-        <span class="tag">Approved CC Match</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-  <div class="stage" onclick="toggle(this)">
-    <div class="stage-header">
-      <div class="stage-icon" style="background:#f5f0ff; color:#7a4cc4;">📝</div>
-      <div class="stage-label">
-        <h2>Onboarding</h2>
-        <p>Getting everything in place</p>
-      </div>
-      <span class="chevron">▼</span>
-    </div>
-    <div class="stage-detail">
-      <div class="stage-detail-inner">
-        <span class="tag">Book &amp; Send Paperwork</span>
-        <span class="tag">Paperwork Approved</span>
-        <span class="tag">1st Appointment Booked</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
-
-  <div class="final-badge">
-    <div class="badge">✦ Officially a Client</div>
-  </div>
-
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#8c6f5e"></div> Manual step</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3a7bc8"></div> Auto-triggered</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div> Urgent escalation</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div> Milestone</div>
 </div>
-
-<footer>Click any stage to expand details</footer>
-
+<div class="journey">
+  <div class="stage" onclick="toggle(this)">
+    <div class="stage-header">
+      <div class="stage-icon" style="background:#fef3ec;color:#c47a3a;">🔍</div>
+      <div class="stage-label"><h2>Discovery</h2><p>How prospective clients find us</p></div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-detail"><div class="stage-detail-inner">
+      <div class="detail-section"><h3>Channels</h3><div class="tags">
+        <span class="tag">Google Search</span><span class="tag">Referrals</span><span class="tag">Advertisements</span><span class="tag">Social Media</span><span class="tag">In-person Events</span><span class="tag">Attorney Referral</span>
+      </div></div>
+    </div></div>
+  </div>
+  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+  <div class="stage" onclick="toggle(this)">
+    <div class="stage-header">
+      <div class="stage-icon" style="background:#eef6ff;color:#3a7bc8;">📞</div>
+      <div class="stage-label"><h2>First Contact</h2><p>Inquiry enters the system</p></div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-detail"><div class="stage-detail-inner">
+      <div class="detail-section"><h3>Entry Points</h3><div class="tags">
+        <span class="tag">Main Website Form</span><span class="tag">All Inquiries Webform</span><span class="tag">Phone Call (CCC#)</span><span class="tag">SMS to CCC#</span><span class="tag">Email to CCC#</span><span class="tag">Live Chat</span><span class="tag">Petra's Direct Line</span>
+      </div></div>
+      <div class="detail-section"><h3>Automations Triggered</h3><div class="tags">
+        <span class="tag auto">Opportunity auto-created in All Inquiries pipeline</span><span class="tag auto">Team notification sent</span><span class="tag auto">Tagged by source</span>
+      </div></div>
+    </div></div>
+  </div>
+  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+  <div class="stage" onclick="toggle(this)">
+    <div class="stage-header">
+      <div class="stage-icon" style="background:#fff0f0;color:#dc2626;">⚡</div>
+      <div class="stage-label"><h2>Response &amp; Follow-up</h2><p>Team contacts the prospective client</p></div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-detail"><div class="stage-detail-inner">
+      <div class="detail-section"><h3>Pipeline Stages</h3><div class="tags">
+        <span class="tag">New Inquiry (Not Contacted)</span><span class="tag">Calls, Txts, Emails</span><span class="tag">Needs Contacting Again</span><span class="tag">Client Responded</span><span class="tag">Follow Up Needed</span><span class="tag">Waiting on Client Response</span><span class="tag">Waiting on 3rd Party</span>
+      </div></div>
+      <div class="detail-section"><h3>Escalation Automations</h3><div class="tags">
+        <span class="tag urgent">No response in 9 business hours → URGENT</span><span class="tag urgent">Waiting on response 16 business hours → URGENT</span><span class="tag urgent">Low priority: 32 business hours → URGENT</span><span class="tag auto">Follow Up Needed → auto-moves after 1 day</span><span class="tag auto">Waiting on Client → auto-moves after 2 days</span>
+      </div></div>
+    </div></div>
+  </div>
+  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+  <div class="stage" onclick="toggle(this)">
+    <div class="stage-header">
+      <div class="stage-icon" style="background:#f0faf0;color:#3a8c4a;">🤝</div>
+      <div class="stage-label"><h2>Clinician Matching</h2><p>Finding the right fit</p></div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-detail"><div class="stage-detail-inner">
+      <div class="detail-section"><h3>Steps</h3><div class="tags">
+        <span class="tag">Clinician Matching Form submitted</span><span class="tag">Insurance &amp; Pricing reviewed</span><span class="tag">Approved Clinician-Client Match</span>
+      </div></div>
+      <div class="detail-section"><h3>Automations</h3><div class="tags">
+        <span class="tag auto">Clinician matching form → opportunity updated</span><span class="tag auto">Appointment Desk Survey → opportunity linked</span><span class="tag auto">Clinician data synced to contact record</span>
+      </div></div>
+    </div></div>
+  </div>
+  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+  <div class="stage" onclick="toggle(this)">
+    <div class="stage-header">
+      <div class="stage-icon" style="background:#f5f0ff;color:#7a4cc4;">📅</div>
+      <div class="stage-label"><h2>Scheduling</h2><p>Booking the first appointment</p></div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-detail"><div class="stage-detail-inner">
+      <div class="detail-section"><h3>Pipeline Stages</h3><div class="tags">
+        <span class="tag">Consult or FollowUp Scheduled</span><span class="tag">Ready to Schedule</span><span class="tag">Waiting List</span>
+      </div></div>
+      <div class="detail-section"><h3>Automations</h3><div class="tags">
+        <span class="tag auto">Consult calendar confirmation sent</span><span class="tag auto">Consult reminder sent</span><span class="tag auto">Consultation event → pipeline stage updated</span><span class="tag auto">7-day waitlist reminder</span>
+      </div></div>
+    </div></div>
+  </div>
+  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+  <div class="stage" onclick="toggle(this)">
+    <div class="stage-header">
+      <div class="stage-icon" style="background:#fffbea;color:#c47a00;">📝</div>
+      <div class="stage-label"><h2>Paperwork</h2><p>Completing intake documentation</p></div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-detail"><div class="stage-detail-inner">
+      <div class="detail-section"><h3>Pipeline Stage</h3><div class="tags">
+        <span class="tag">PWK Pending (Scheduled)</span>
+      </div></div>
+      <div class="detail-section"><h3>Automations</h3><div class="tags">
+        <span class="tag auto">Paperwork sent to client</span><span class="tag urgent">Paperwork incomplete after 48 hrs → URGENT</span><span class="tag auto">New Client Form submission triggers next steps</span>
+      </div></div>
+    </div></div>
+  </div>
+  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+  <div class="stage" onclick="toggle(this)">
+    <div class="stage-header">
+      <div class="stage-icon" style="background:#f0fff4;color:#16a34a;">✅</div>
+      <div class="stage-label"><h2>Officially a Client</h2><p>First appointment booked, paperwork complete</p></div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-detail"><div class="stage-detail-inner">
+      <div class="detail-section"><h3>Milestones</h3><div class="tags">
+        <span class="tag green">Moved to "Completed — Current Clients" in All Inquiries</span><span class="tag green">Entered NEW CLIENTS pipeline (first 6 months)</span><span class="tag green">Client Status synced to Contact Type</span>
+      </div></div>
+      <div class="detail-section"><h3>Active Automations</h3><div class="tags">
+        <span class="tag auto">72-hour appointment reminder</span><span class="tag auto">Satisfaction survey after sessions</span><span class="tag auto">Google Review link tracker</span><span class="tag auto">New client survey (first 6 months)</span>
+      </div></div>
+    </div></div>
+  </div>
+  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+  <div class="stage" onclick="toggle(this)">
+    <div class="stage-header">
+      <div class="stage-icon" style="background:#eef6ff;color:#0369a1;">🔄</div>
+      <div class="stage-label"><h2>Ongoing Care</h2><p>Retaining and re-engaging active clients</p></div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-detail"><div class="stage-detail-inner">
+      <div class="detail-section"><h3>Active Care Gaps Pipeline</h3><div class="tags">
+        <span class="tag">1–7 Days Since Last Appt</span><span class="tag">8–14 Days SLA</span><span class="tag">2–4 Weeks SLA</span><span class="tag">1–2 Months SLA</span><span class="tag">2+ Months SLA</span><span class="tag urgent">6+ Months SLA</span><span class="tag urgent">1 Year+ SLA</span>
+      </div></div>
+      <div class="detail-section"><h3>Re-engagement Automations</h3><div class="tags">
+        <span class="tag auto">No Next Appointment tag → automation triggered</span><span class="tag auto">Overdue balance → pipeline stage updated</span><span class="tag auto">Med. Management request → separate pipeline</span>
+      </div></div>
+    </div></div>
+  </div>
+  <div class="connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+  <div class="final-badge"><div class="badge">✦ Long-Term Client</div></div>
+</div>
+<footer>Click any stage to expand — sourced from GoHighLevel CRM</footer>
 <script>
   function toggle(el) {
     const isActive = el.classList.contains('active');
@@ -330,6 +200,5 @@
     if (!isActive) el.classList.add('active');
   }
 </script>
-
 </body>
 </html>
