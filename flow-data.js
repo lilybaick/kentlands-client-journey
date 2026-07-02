@@ -66,7 +66,20 @@ window.JOURNEY = {
                   ]
                 },
                 { id: "nc-therapist", label: "Find a therapist", type: "stage", detail: ["Transferred to find a good-fit therapist", "Or uses the online Matching Tool"], children: [ { id: "ref-therapist", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
-                { id: "nc-prescriber", label: "Prescriber", sub: "Psychiatry / medication", type: "stage", detail: ["Dr. Adrian Kress (MD psychiatrist)", "Dr. Brent Donmoyer (PMHNP)"], children: [ { id: "ref-presc", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
+                {
+                  id: "nc-prescriber", label: "Prescriber", sub: "Psychiatry / medication", type: "decision",
+                  detail: ["Two providers; caller chooses how to learn more (press 1–4)"],
+                  children: [
+                    { id: "presc-kress", label: "Dr. Adrian Kress", sub: "MD psychiatrist · press 1", type: "stage",
+                      detail: ["Text-back with his fees & info"], children: [ { id: "ref-presc-kress", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
+                    { id: "presc-donmoyer", label: "Dr. Brent Donmoyer", sub: "PMHNP · press 2", type: "stage",
+                      detail: ["Text-back with his fees & info"], children: [ { id: "ref-presc-don", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
+                    { id: "presc-both", label: "Info on both", sub: "press 3", type: "stage",
+                      detail: ["Text-back with both providers' fees & info"], children: [ { id: "ref-presc-both", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] },
+                    { id: "presc-talk", label: "Talk to someone now", sub: "press 4", type: "stage",
+                      detail: ["Speak with the team about who's the best fit"], children: [ { id: "ref-presc-talk", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] }
+                  ]
+                },
                 { id: "nc-testing", label: "Testing program", sub: "$4,320 package", type: "stage", detail: ["~20 hrs of psychologist time", "Free 20-min consult → pre-meeting → testing → results + report"], children: [ { id: "ref-testing", label: "→ Creates an inquiry", type: "ref", to: "inquiry" } ] }
               ]
             },

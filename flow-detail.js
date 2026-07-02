@@ -75,6 +75,18 @@ window.FLOW_DETAIL = {
     { type: "script", title: "What we say", body: "“We have two prescribers — Dr. Adrian Kress (MD psychiatrist) and Dr. Brent Donmoyer (PMHNP). Press 1 to text fees & info on Dr. Kress, 2 for Dr. Donmoyer, 3 for both, or 4 to talk with someone about who fits best.”" },
     { type: "textback", title: "Auto text-back", body: "Sends the chosen prescriber's fees + info by text so the caller has it in hand." }
   ],
+  "presc-kress": [
+    { type: "textback", title: "Press 1 → auto text-back", body: "Texts Dr. Adrian Kress's fees & info (MD-level psychiatrist) so the caller has it in hand." }
+  ],
+  "presc-donmoyer": [
+    { type: "textback", title: "Press 2 → auto text-back", body: "Texts Dr. Brent Donmoyer's fees & info (doctoral-level Psychiatric Mental Health Nurse Practitioner)." }
+  ],
+  "presc-both": [
+    { type: "textback", title: "Press 3 → auto text-back", body: "Texts fees & info for both prescribers so the caller can compare." }
+  ],
+  "presc-talk": [
+    { type: "script", title: "Press 4 → what we say", body: "“…to talk with someone now about these providers and learn more about who might be the best fit for you.” Routes the caller to the team." }
+  ],
 
   "nc-testing": [
     { type: "script", title: "What we say", body: "“Our testing program is comprehensive — about 20 hours of psychologist time: a free 20-minute consult, a pre-meeting, two half-days of testing, then a results meeting with a written report.”" },
