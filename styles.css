@@ -375,6 +375,8 @@ footer { text-align: center; margin-top: 40px; font-size: 0.74rem; color: #bbb; 
   display: flex; flex-direction: column; overflow: hidden;
 }
 .node-drawer.open { transform: translateX(0); }
+/* while the drawer is open, shrink the canvas to the left of it so no nodes hide underneath */
+.flow-stage.drawer-open .flow-scroll { margin-right: min(400px, 92vw); }
 .nd-close { position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border-radius: 50%;
   border: 1.5px solid var(--border); background: #fff; color: #6a5a4e; cursor: pointer; font-size: 0.85rem; z-index: 2; }
 .nd-close:hover { border-color: var(--brown); color: var(--brown); }
@@ -435,9 +437,11 @@ footer { text-align: center; margin-top: 40px; font-size: 0.74rem; color: #bbb; 
   box-shadow: 0 0 0 2px rgba(140,111,94,0.6), 0 8px 26px rgba(140,111,94,0.28) !important; }
 .flow-inner.has-selection .node-card.drawer-active { opacity: 1; }
 @media (max-width: 620px) {
-  .node-drawer { width: 100%; top: auto; height: 84vh; border-left: none; border-top: 1.5px solid var(--border);
+  .node-drawer { width: 100%; top: auto; height: 76vh; border-left: none; border-top: 1.5px solid var(--border);
     border-radius: 18px 18px 0 0; transform: translateY(112%); }
   .node-drawer.open { transform: translateY(0); }
+  /* on mobile the drawer is a bottom sheet — shrink the canvas vertically instead of horizontally */
+  .flow-stage.drawer-open .flow-scroll { margin-right: 0; max-height: 22vh; }
 }
 
 /* ── Journey Blueprint (blueprint.html) ─────────────── */

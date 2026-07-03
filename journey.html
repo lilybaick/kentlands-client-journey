@@ -248,10 +248,10 @@ function paintSelection() {
   svg.querySelectorAll("path").forEach(p =>
     p.classList.toggle("hl", !!path && path.has(p.dataset.to)));
 }
-scrollEl.addEventListener("click", (e) => {           // click empty canvas clears
-  if (e.target === scrollEl || e.target === sizer || e.target === inner || e.target.tagName === "svg") {
-    selectedId = null; paintSelection(); closeDrawer();
-  }
+scrollEl.addEventListener("click", (e) => {           // click empty canvas clears selection + closes drawer
+  if (panMoved) return;                               // ignore the click that ends a pan-drag
+  if (e.target.closest(".node-card, .node-toggle")) return;   // clicks on boxes do their own thing
+  selectedId = null; paintSelection(); closeDrawer();
 });
 
 /* ── node detail drawer (scripts, text-backs, links) ─────── */
@@ -310,12 +310,16 @@ function openDrawer(id) {
   document.getElementById("nd-body").innerHTML = '<div class="nd-path">' + crumbs + '</div>' + html + next;
   document.getElementById("nd-body").scrollTop = 0;
   document.getElementById("node-drawer").classList.add("open");
+  stageEl.classList.add("drawer-open");     // shrink the canvas so it no longer sits under the panel
+  applyZoom();                              // recompute scroll range for the narrower canvas
   treeEl.querySelectorAll(".node-card.drawer-active").forEach(c => c.classList.remove("drawer-active"));
-  const cardEl = treeEl.querySelector('.node-card[data-id="' + id + '"]'); if (cardEl) cardEl.classList.add("drawer-active");
+  const cardEl = treeEl.querySelector('.node-card[data-id="' + id + '"]');
+  if (cardEl) { cardEl.classList.add("drawer-active"); scrollToCard(cardEl); }   // bring it into the visible area
 }
 function closeDrawer() {
   openId = null;
   document.getElementById("node-drawer").classList.remove("open");
+  if (stageEl.classList.contains("drawer-open")) { stageEl.classList.remove("drawer-open"); applyZoom(); }
   treeEl.querySelectorAll(".node-card.drawer-active").forEach(c => c.classList.remove("drawer-active"));
 }
 function navTo(id) { jumpTo(id); openDrawer(id); }
@@ -360,14 +364,15 @@ function paintSearch() {
 }
 
 /* ── pan: drag empty canvas ─────────────── */
-let panning = false, sx, sy, sl, st;
+let panning = false, panMoved = false, sx, sy, sl, st;
 scrollEl.addEventListener("mousedown", (e) => {
   if (e.target.closest(".node-card, .node-toggle")) return;   // let cards/buttons work
-  panning = true; sx = e.clientX; sy = e.clientY; sl = scrollEl.scrollLeft; st = scrollEl.scrollTop;
+  panning = true; panMoved = false; sx = e.clientX; sy = e.clientY; sl = scrollEl.scrollLeft; st = scrollEl.scrollTop;
   scrollEl.classList.add("grabbing");
 });
 window.addEventListener("mousemove", (e) => {
   if (!panning) return;
+  if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 4) panMoved = true;   // it's a drag, not a click
   scrollEl.scrollLeft = sl - (e.clientX - sx); scrollEl.scrollTop = st - (e.clientY - sy);
 });
 window.addEventListener("mouseup", () => { panning = false; scrollEl.classList.remove("grabbing"); });
