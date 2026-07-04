@@ -117,9 +117,6 @@ window.FLOW_DETAIL = {
   webforms: [
     { type: "behind", title: "Every form lands the same way", body: "Main Website, All-Inquiries, Testing, and Cancellation forms each create an Opportunity and notify the team." }
   ],
-  tools: [
-    { type: "tool", title: "The three KP tools", body: "Matching Tool (public search), CCC Console (coordinator co-pilot), and Clinician Console (self-service) — all feed the same All Inquiries pipeline." }
-  ],
 
   response: [
     { type: "behind", title: "The escalation engine", body: "If there's no reply: follow-up 9h → URGENT, waiting-on-response 16h → URGENT, low-priority 32h → URGENT. RESPONDED automations reset the clock the moment the client replies." },
@@ -151,12 +148,6 @@ window.FLOW_DETAIL = {
   "matching-tool": [
     { type: "tool", title: "How it works", body: "A prospective client answers a few questions — type of care, then their needs in their own words — and gets the best 1–3 clinicians, ranked, with the reason each fits. It never shows an empty screen: if no one's open, it offers a 'welcoming clients soon' tier." },
     { type: "behind", title: "Behind the scenes", body: "Same scoring engine as the CCC Console. Reads live availability from GHL and collects ZERO PHI — identifying info only appears at the hand-off form." }
-  ],
-  "mt-medication": [
-    { type: "note", title: "All prescribers shown", body: "When 'Medication' is picked, every available prescriber is listed (not just the top 3): Dr. Adrian Kress (MD psychiatrist) and Dr. Brent Donmoyer (PMHNP)." }
-  ],
-  "mt-testing": [
-    { type: "script", title: "What the client sees", body: "A shared Testing Team card appears first — always available, even when the psychologists are full — with the ~20-hour process and the $4,320 package. 'Reach out to our team' sets up the discovery call." }
   ],
   "mt-book": [
     { type: "script", title: "The disclaimer (shown first)", body: "“Before you reach out — Kentlands is out-of-network. Most clients pay out of pocket and use a monthly superbill for reimbursement.” Then the client chooses their path." },
@@ -250,9 +241,6 @@ window.FLOW_DETAIL = {
   ],
   "mt-results": [
     { type: "tool", title: "Step 3 · the matches", body: "Therapy → ranked by fit; Medication → every available prescriber; Testing → the shared team card. Always the best 1–3, never an empty screen — a pending 'welcoming soon' tier appears if no one is open." }
-  ],
-  "mt-therapy": [
-    { type: "tool", title: "How the therapy match works", body: "Ranks open clinicians by specialty, population, age, location and PSYPACT — plus a non-AI read of the client's own words against each bio. Always returns the best 1–3, never an empty screen." }
   ],
   "mt-insq": [
     { type: "behind", title: "Insurance question", body: "Routes an insurance question to the team, tagged '— Insurance question' so it's answered fast." }

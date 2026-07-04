@@ -32,8 +32,11 @@ kentlands-client-journey/
 ├── tools.html            ← The 3 KP tools + GHL  (internal)
 ├── system-map.html       ← GHL inventory dashboard (internal)
 ├── styles.css            ← Shared design system
+├── site.js               ← The shared top nav (edit ONE place to add a page/link)
 ├── flow-data.js          ← The journey flow chart, as editable data (see below)
+├── flow-detail.js        ← Click-through detail (scripts/FAQs/checklists/watch-outs) per node
 ├── blueprint-data.js     ← The blueprint stages, as editable data
+├── validate.js           ← `node validate.js` — checks the flow data (run before committing)
 ├── README.md             ← This file
 └── content/              ← Plain-text source of truth (edit here, ask Claude to regenerate)
     ├── journey-stages.md
