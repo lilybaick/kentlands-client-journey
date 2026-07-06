@@ -15,7 +15,7 @@ An interactive visual map of how a prospective client becomes a long-term client
 | `tools.html` | The 3 custom KP tools and how each connects to GHL | 🔒 Internal reference |
 | `system-map.html` | Full GHL inventory dashboard + automations, with a live data snapshot | 🔒 Internal reference |
 
-`styles.css` is the shared design system used by every page.
+`styles.css` is the shared design system used by every page. Press **⌘K** (or **Ctrl-K**) on any page for a command palette that jumps to any page or any of the ~60 journey steps. On the Journey page, **🧭 Tour** narrates the whole loop in 11 stops.
 
 > **Note on the two 🔒 pages.** `tools.html` and `system-map.html` are labeled "Internal reference." They're safe to share with the team but are operational detail, not marketing.
 
@@ -31,8 +31,8 @@ kentlands-client-journey/
 ├── phone-tree.html       ← Interactive phone tree
 ├── tools.html            ← The 3 KP tools + GHL  (internal)
 ├── system-map.html       ← GHL inventory dashboard (internal)
-├── styles.css            ← Shared design system
-├── site.js               ← The shared top nav (edit ONE place to add a page/link)
+├── styles.css            ← Shared design system (design tokens + dual serif/sans font system)
+├── site.js               ← Shared top nav + site-wide ⌘K command palette (edit ONE place to add a page/link)
 ├── flow-data.js          ← The journey flow chart, as editable data (see below)
 ├── flow-detail.js        ← Click-through detail (scripts/FAQs/checklists/watch-outs) per node
 ├── blueprint-data.js     ← The blueprint stages, as editable data

@@ -18,11 +18,17 @@
   </header>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#3a7bc8"></div> Entry point</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#7a4cc4"></div> Decision</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#8c6f5e"></div> Step</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div> Milestone</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div> Urgent / can't serve</div>
+    <div class="legend-item"><div class="legend-dot type-entry"></div> Entry point</div>
+    <div class="legend-item"><div class="legend-dot type-decision"></div> Decision</div>
+    <div class="legend-item"><div class="legend-dot type-stage"></div> Step</div>
+    <div class="legend-item"><div class="legend-dot type-milestone"></div> Milestone</div>
+    <div class="legend-item"><div class="legend-dot type-urgent"></div> Urgent / can't serve</div>
+  </div>
+
+  <div class="hint-bubble" id="hint-bubble" hidden>
+    <span>👋 <strong>New here?</strong> Click any box for its script &amp; details, or take the guided tour of the whole loop.</span>
+    <button onclick="startTour()">🧭 Take the tour</button>
+    <button onclick="dismissHint()" aria-label="Dismiss hint" title="Dismiss">Got it ✕</button>
   </div>
 
   <!-- everything inside .flow-stage is what goes fullscreen -->
@@ -34,6 +40,7 @@
         <span class="s-count" id="s-count"></span>
       </div>
       <div class="tb-spacer"></div>
+      <button class="flow-btn" id="tour-btn" onclick="toggleTour()">🧭 Tour</button>
       <button class="flow-btn" onclick="expandAll()">Expand all</button>
       <button class="flow-btn" onclick="collapseAll()">Collapse</button>
       <div class="zoom-group">
@@ -42,6 +49,16 @@
         <button class="flow-btn ic" onclick="zoomBy(0.15)" title="Zoom in">+</button>
       </div>
       <button class="flow-btn ic" id="fs-btn" onclick="toggleFull()" title="Fullscreen">⛶</button>
+    </div>
+
+    <div class="tour-bar" id="tour-bar" hidden>
+      <span class="tour-count" id="tour-count"></span>
+      <span class="tour-blurb" id="tour-blurb"></span>
+      <div class="tour-btns">
+        <button class="flow-btn" id="tour-prev" onclick="tourPrev()">← Back</button>
+        <button class="flow-btn tour-active" id="tour-next" onclick="tourNext()">Next →</button>
+        <button class="flow-btn ic" onclick="toggleTour()" title="Exit tour" aria-label="Exit tour">✕</button>
+      </div>
     </div>
 
     <div class="flow-scroll" id="flow">
@@ -53,8 +70,8 @@
       </div>
     </div>
 
-    <aside class="node-drawer" id="node-drawer">
-      <button class="nd-close" id="nd-close" onclick="closeDrawer()" title="Close">✕</button>
+    <aside class="node-drawer" id="node-drawer" role="dialog" aria-modal="false" aria-labelledby="nd-title" tabindex="-1" aria-hidden="true">
+      <button class="nd-close" id="nd-close" onclick="closeDrawer()" title="Close (Esc)" aria-label="Close details">✕</button>
       <div class="nd-head">
         <span class="nd-ic" id="nd-ic"></span>
         <div class="nd-head-txt"><h3 id="nd-title"></h3><p id="nd-sub"></p></div>
@@ -117,9 +134,17 @@ function buildNode(node) {
   if (hasDetail) { const b = document.createElement("span"); b.className = "detail-badge"; b.textContent = "💬"; b.title = "Click for its script & details"; card.appendChild(b); }
 
   if (node.type === "ref" && node.to) {
+    card.tabIndex = 0;
+    card.setAttribute("role", "link");
+    card.setAttribute("aria-label", clean(node.label) + " — jump to linked step");
     card.addEventListener("click", (e) => { e.stopPropagation(); jumpTo(node.to); });
+    card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); jumpTo(node.to); } });
   } else if (node.id !== "root") {
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", clean(node.label) + (node.sub ? " — " + node.sub : "") + " — open details");
     card.addEventListener("click", (e) => { e.stopPropagation(); selectPath(node.id); openDrawer(node.id); });
+    card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectPath(node.id); openDrawer(node.id); } });
   }
 
   const kids = node.children || [];
@@ -158,6 +183,9 @@ function applyZoom() {
   sizer.style.height = (lh * scale) + "px";
   zlabel.textContent = Math.round(scale * 100) + "%";
   drawConnectors(lw, lh);
+  // drawConnectors rebuilds every <path>, so re-apply highlight/search paint (which live on paths)
+  if (selectedId) paintSelection();
+  if (searchMatches.length) paintSearch();
 }
 
 function drawConnectors(lw, lh) {
@@ -248,7 +276,14 @@ scrollEl.addEventListener("click", (e) => {           // click empty canvas clea
 });
 
 /* ── node detail drawer (scripts, text-backs, links) ─────── */
-const TYPE_COLORS = { entry:"#3a7bc8", decision:"#7a4cc4", stage:"#8c6f5e", pipeline:"#b8863e", milestone:"#16a34a", urgent:"#dc2626", root:"#3a3a3a", ref:"#b0a89f" };
+// single source of truth: the --type-* custom properties in styles.css
+const TYPE_COLORS = (() => {
+  const cs = getComputedStyle(document.documentElement);
+  const get = (k, fb) => (cs.getPropertyValue("--type-" + k).trim() || fb);
+  return { entry:get("entry","#3a7bc8"), decision:get("decision","#7a4cc4"), stage:get("stage","#8c6f5e"),
+           pipeline:get("pipeline","#b8863e"), milestone:get("milestone","#16a34a"), urgent:get("urgent","#dc2626"),
+           root:get("root","#3a3a3a"), ref:get("ref","#b0a89f") };
+})();
 const MOD_META = {
   script:    { ic:"💬", label:"The script" },
   behind:    { ic:"⚙️", label:"Behind the scenes" },
@@ -302,18 +337,26 @@ function openDrawer(id) {
   }
   document.getElementById("nd-body").innerHTML = '<div class="nd-path">' + crumbs + '</div>' + html + next;
   document.getElementById("nd-body").scrollTop = 0;
-  document.getElementById("node-drawer").classList.add("open");
+  const drawer = document.getElementById("node-drawer");
+  drawer.classList.add("open");
+  drawer.setAttribute("aria-hidden", "false");
   stageEl.classList.add("drawer-open");     // shrink the canvas so it no longer sits under the panel
   applyZoom();                              // recompute scroll range for the narrower canvas
   treeEl.querySelectorAll(".node-card.drawer-active").forEach(c => c.classList.remove("drawer-active"));
   const cardEl = treeEl.querySelector('.node-card[data-id="' + id + '"]');
   if (cardEl) { cardEl.classList.add("drawer-active"); scrollToCard(cardEl); }   // bring it into the visible area
+  drawer.focus({ preventScroll: true });    // move focus into the dialog for keyboard + screen-reader users
 }
 function closeDrawer() {
+  const wasOpen = !!openId;
+  const returnEl = openId ? treeEl.querySelector('.node-card[data-id="' + openId + '"]') : null;
   openId = null;
-  document.getElementById("node-drawer").classList.remove("open");
+  const drawer = document.getElementById("node-drawer");
+  drawer.classList.remove("open");
+  drawer.setAttribute("aria-hidden", "true");
   if (stageEl.classList.contains("drawer-open")) { stageEl.classList.remove("drawer-open"); applyZoom(); }
   treeEl.querySelectorAll(".node-card.drawer-active").forEach(c => c.classList.remove("drawer-active"));
+  if (wasOpen && returnEl) returnEl.focus({ preventScroll: true });   // restore focus to the card that opened it
 }
 function navTo(id) { jumpTo(id); openDrawer(id); }
 function copyMod(btn) {
@@ -333,7 +376,51 @@ function copyMod(btn) {
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(fallback);
   else fallback();
 }
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawer(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeDrawer(); if (tourOn) toggleTour(); } });
+
+/* ── guided tour — narrates the one-connected-loop in 11 stops ─────── */
+const TOUR = [
+  { id: "entry",         blurb: "Every journey starts here — the three front doors a person can come through: the phone tree, a web form, or our self-serve Matching Tool." },
+  { id: "phone",         blurb: "Most people call. The phone tree screens spam, figures out why they're calling, and quietly opens an inquiry so nobody is lost." },
+  { id: "insurance",     blurb: "The real filter. KP is out-of-network, so the menu pre-qualifies callers by coverage — the team's time goes to good-fit leads." },
+  { id: "matching-tool", blurb: "The self-serve path: a 3-step wizard that finds a client their own match. Insurance only comes up at the very end, when they connect." },
+  { id: "inquiry",       blurb: "However they arrived, everyone lands in one place — the All Inquiries pipeline. This is the spine the whole practice runs on." },
+  { id: "response",      blurb: "The team makes contact. If they don't, an escalation engine flags the inquiry URGENT at 9, 16, and 32 business hours — no lead goes cold." },
+  { id: "matching",      blurb: "Now the fit work: the matching form and appointment-desk survey narrow to the right clinician, with availability kept fresh automatically." },
+  { id: "paperwork",     blurb: "Scheduling and intake. Paperwork still incomplete after 48 hours? It's flagged URGENT — this is where people are most likely to drop." },
+  { id: "client",        blurb: "The milestone: booked + paperwork done = officially a client. Future calls now route them to the Existing-Client menu instead." },
+  { id: "retention",     blurb: "Care doesn't stop at 'won.' Care-gap tracking, surveys, reviews and reactivation keep clients cared for over time." },
+  { id: "team-tools",    blurb: "Behind all of it: two internal tools — the coordinator's call co-pilot and the clinician self-service — that quietly keep the match current." }
+];
+let tourOn = false, tourIdx = 0;
+function startTour() { dismissHint(); if (!tourOn) toggleTour(); }
+function toggleTour() {
+  tourOn = !tourOn;
+  document.getElementById("tour-bar").hidden = !tourOn;
+  document.getElementById("tour-btn").classList.toggle("tour-active", tourOn);
+  if (tourOn) { tourIdx = 0; tourGo(); }
+  else { closeDrawer(); selectedId = null; paintSelection(); }
+}
+function tourGo() {
+  const stop = TOUR[tourIdx];
+  document.getElementById("tour-count").textContent = "Stop " + (tourIdx + 1) + " / " + TOUR.length;
+  document.getElementById("tour-blurb").textContent = stop.blurb;
+  document.getElementById("tour-prev").disabled = tourIdx === 0;
+  document.getElementById("tour-next").textContent = tourIdx === TOUR.length - 1 ? "Finish ✓" : "Next →";
+  jumpTo(stop.id);            // reveal + scroll + flash + trace its path from root
+  openDrawer(stop.id);        // show its detail
+}
+function tourNext() { if (tourIdx < TOUR.length - 1) { tourIdx++; tourGo(); } else toggleTour(); }
+function tourPrev() { if (tourIdx > 0) { tourIdx--; tourGo(); } }
+
+/* first-visit nudge (once per browser) */
+try {
+  if (!localStorage.getItem("kp-journey-seen")) document.getElementById("hint-bubble").hidden = false;
+} catch (e) {}
+function dismissHint() {
+  document.getElementById("hint-bubble").hidden = true;
+  try { localStorage.setItem("kp-journey-seen", "1"); } catch (e) {}
+}
 
 /* ── search (best-idea #3) ──────────────── */
 let searchMatches = [];
@@ -391,8 +478,21 @@ document.addEventListener("fullscreenchange", () => {
 
 window.addEventListener("resize", () => applyZoom());
 window.addEventListener("load", () => applyZoom());
+
+/* open a node by id from anywhere (used by the ⌘K command palette + deep links) */
+window.openNode = function (id) {
+  if (!byId[id]) return;
+  jumpTo(id); openDrawer(id);   // jumpTo already highlights the path; selectPath would toggle it off
+};
+function openFromHash() {
+  const m = /node=([^&]+)/.exec(location.hash || "");
+  if (m) { const id = decodeURIComponent(m[1]); if (byId[id]) setTimeout(() => window.openNode(id), 120); }
+}
+window.addEventListener("hashchange", openFromHash);
+
 render();
 setTimeout(applyZoom, 200);   // redraw once fonts settle
+openFromHash();               // honor a journey.html#node=… deep link on first load
 </script>
 </body>
 </html>
