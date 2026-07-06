@@ -376,7 +376,12 @@ function copyMod(btn) {
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(fallback);
   else fallback();
 }
-document.addEventListener("keydown", e => { if (e.key === "Escape") { closeDrawer(); if (tourOn) toggleTour(); } });
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  const pal = document.getElementById("cmdk");
+  if (pal && !pal.hidden) return;      // the command palette owns Escape while it's open
+  closeDrawer(); if (tourOn) toggleTour();
+});
 
 /* ── guided tour — narrates the one-connected-loop in 11 stops ─────── */
 const TOUR = [

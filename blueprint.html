@@ -180,6 +180,8 @@ function stopAuto() {
 
 document.addEventListener("keydown", e => {
   if (mode !== "walk") return;
+  const pal = document.getElementById("cmdk");
+  if (pal && !pal.hidden) return;      // don't drive the walkthrough while the command palette is open
   if (e.key === "ArrowRight") { e.preventDefault(); next(); }
   if (e.key === "ArrowLeft")  { e.preventDefault(); prev(); }
 });

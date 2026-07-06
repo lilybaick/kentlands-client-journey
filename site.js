@@ -134,7 +134,8 @@
   }
 
   function openPalette() {
-    ensureData(function () { overlay.hidden = false; input.value = ""; sel = 0; paint(); input.focus(); });
+    overlay.hidden = false; input.value = ""; sel = 0; paint(); input.focus();  // open instantly (pages are ready now)
+    ensureData(function () { nodeIndex = null; if (!overlay.hidden) paint(); });  // node results fill in once flow-data.js loads
   }
   function closePalette() { overlay.hidden = true; }
 
@@ -144,10 +145,12 @@
   document.addEventListener("keydown", function (e) {
     if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) { e.preventDefault(); overlay.hidden ? openPalette() : closePalette(); return; }
     if (overlay.hidden) return;
+    // palette is open — it owns the keyboard; block page-level shortcuts (drawer Esc, tour, blueprint arrows) behind the overlay
     if (e.key === "Escape") { e.preventDefault(); closePalette(); }
     else if (e.key === "ArrowDown") { e.preventDefault(); if (sel < items.length - 1) { sel++; paint(); } }
     else if (e.key === "ArrowUp")   { e.preventDefault(); if (sel > 0) { sel--; paint(); } }
     else if (e.key === "Enter")     { e.preventDefault(); activate(items[sel]); }
+    e.stopImmediatePropagation();
   });
   input.addEventListener("input", function () { sel = 0; paint(); });
   list.addEventListener("click", function (e) {

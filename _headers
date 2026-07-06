@@ -1,0 +1,6 @@
+# Netlify headers. Our JS/CSS filenames aren't content-hashed (no build step),
+# so tell browsers to always revalidate — otherwise returning visitors can run
+# a stale site.js / styles.css for hours after a deploy. Files are tiny; a
+# revalidation is a cheap 304 when nothing changed.
+/*
+  Cache-Control: no-cache
